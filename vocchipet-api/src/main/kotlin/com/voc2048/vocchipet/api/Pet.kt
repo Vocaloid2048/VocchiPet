@@ -8,6 +8,22 @@ import java.util.UUID
  */
 interface Pet {
     /**
+     * 獲取寵物的顯示名稱。
+     * Gets the display name of the pet.
+     *
+     * @return 寵物名稱 / The name of the pet.
+     */
+    fun getName(): String
+
+    /**
+     * 設定寵物的顯示名稱。
+     * Sets the display name of the pet.
+     *
+     * @param name 新名稱 / The new name.
+     */
+    fun setName(name: String)
+
+    /**
      * 獲取寵物的屬性數值。
      * Gets the stats of the pet.
      */
@@ -86,26 +102,18 @@ interface Pet {
     fun setAffection(affection: Double)
 
     /**
-     * 獲取寵物的元素屬性。
-     * Gets the elemental attribute of the pet.
+     * 獲取寵物是否為特殊亞種（如流光或染色）。
+     * Gets whether the pet is a special subspecies (e.g., shiny or colored).
      *
-     * @return 寵物的屬性類型 / The attribute type of the pet.
+     * @return 若為特殊亞種則返回 true / True if it is a special subspecies.
      */
-    fun getElement(): Element
+    fun isSubspecies(): Boolean
 
     /**
-     * 獲取寵物是否為流光（閃光）亞種。
-     * Gets whether the pet is a streaming (shiny) subspecies.
+     * 設定寵物的亞種狀態。
+     * Sets the subspecies status of the pet.
      *
-     * @return 若為流光則返回 true / True if it is streaming.
+     * @param subspecies 是否為亞種 / Whether it is a subspecies.
      */
-    fun isStreaming(): Boolean
-
-    /**
-     * 設定寵物的流光狀態。
-     * Sets the streaming status of the pet.
-     *
-     * @param streaming 是否為流光 / Whether it is streaming.
-     */
-    fun setStreaming(streaming: Boolean)
+    fun setSubspecies(subspecies: Boolean)
 }

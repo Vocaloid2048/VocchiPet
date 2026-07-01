@@ -1,13 +1,12 @@
 package com.voc2048.vocchipet.api
 
 /**
- * 代表寵物的五維屬性。
- * Represents the five-dimensional stats of a pet.
+ * 代表寵物的單項屬性組成。
+ * Represents the composition of a single pet stat.
  */
 data class StatComponent(
     val base: Int,
-    val potential: Tier,
-    val trained: Int
+    val potential: Tier
 )
 
 /**
@@ -20,7 +19,6 @@ data class PetStats(
     val defense: StatComponent,
     val speed: StatComponent,
     val focus: StatComponent,
-    val availableTp: Int,
     val skills: Array<String?>
 ) {
     override fun equals(other: Any?): Boolean {
@@ -31,7 +29,6 @@ data class PetStats(
         if (defense != other.defense) return false
         if (speed != other.speed) return false
         if (focus != other.focus) return false
-        if (availableTp != other.availableTp) return false
         if (!skills.contentEquals(other.skills)) return false
         return true
     }
@@ -42,7 +39,6 @@ data class PetStats(
         result = 31 * result + defense.hashCode()
         result = 31 * result + speed.hashCode()
         result = 31 * result + focus.hashCode()
-        result = 31 * result + availableTp
         result = 31 * result + skills.contentHashCode()
         return result
     }

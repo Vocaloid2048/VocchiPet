@@ -1,6 +1,6 @@
 package com.voc2048.vocchipet.api
 
-import org.bukkit.inventory.ItemStack
+import org.bukkit.entity.EntityType
 
 /**
  * 代表寵物的種類定義。
@@ -20,20 +20,14 @@ data class PetSpecies(
     val displayName: String,
 
     /**
-     * 元素屬性。
-     * Elemental attribute.
+     * 對應的 Minecraft 原生實體類型。
+     * The corresponding Minecraft vanilla entity type.
      */
-    val element: Element,
+    val entityType: EntityType,
 
     /**
      * 基礎屬性。
      * Base stats.
      */
-    val baseStats: PetStats,
-
-    /**
-     * 渲染模型所需的物品。
-     * ItemStack required for model rendering.
-     */
-    val modelItem: ItemStack
+    val baseStats: PetStats
 )
