@@ -11,6 +11,7 @@ val buildTime = SimpleDateFormat("yyyyMMdd-HHmm").format(Date())
 
 dependencies {
     implementation(project(":vocchipet-api"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.0")
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
     testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.128.0")
