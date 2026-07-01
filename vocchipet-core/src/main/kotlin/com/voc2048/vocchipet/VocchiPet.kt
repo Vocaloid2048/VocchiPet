@@ -1,11 +1,6 @@
 package com.voc2048.vocchipet
 
-import com.voc2048.vocchipet.api.render.ModelEngine
-import com.voc2048.vocchipet.api.render.ModelRegistry
-import com.voc2048.vocchipet.api.storage.ModelStorage
 import com.voc2048.vocchipet.api.storage.PetStorage
-import com.voc2048.vocchipet.render.DefaultModelRegistry
-import com.voc2048.vocchipet.render.PetSpawnManager
 import com.voc2048.vocchipet.storage.SqlitePetStorage
 import com.voc2048.vocchipet.interaction.*
 import com.voc2048.vocchipet.core.PetSpeciesRegistry
@@ -22,9 +17,6 @@ import java.util.concurrent.Executors
 class VocchiPet : JavaPlugin() {
 
     private lateinit var petStorage: PetStorage
-    private lateinit var modelStorage: ModelStorage
-    private lateinit var modelRegistry: ModelRegistry
-    private lateinit var modelEngine: ModelEngine
     private lateinit var databaseExecutor: Executor
     
     private lateinit var speciesRegistry: PetSpeciesRegistry
@@ -53,24 +45,13 @@ class VocchiPet : JavaPlugin() {
         mainMenuGui = MainMenuGui(this)
         constructionGui = PetConstructionMasterGui(this)
 
-        // 初始化儲存器與註冊表
+        // 初始化儲存器
         val dbFile = File(dataFolder, "storage.db")
         val sqliteStorage = SqlitePetStorage(dbFile, databaseExecutor)
         petStorage = sqliteStorage
-        modelStorage = sqliteStorage
         
-        modelRegistry = DefaultModelRegistry()
-        modelEngine = PetSpawnManager(modelRegistry)
-
-        sqliteStorage.init().thenCompose {
+        sqliteStorage.init().thenAccept {
             logger.info("SQLite 數據庫初始化成功。")
-            // 加載所有模型映射
-            modelStorage.loadAllModels()
-        }.thenAccept { models ->
-            models.forEach { (key, item) ->
-                modelRegistry.registerModel(key, item)
-            }
-            logger.info("已加載 ${models.size} 個模型映射。")
         }.exceptionally { ex ->
             logger.severe("初始化過程中發生錯誤: ${ex.message}")
             null
@@ -98,22 +79,6 @@ class VocchiPet : JavaPlugin() {
      * @return 寵物儲存器實例 / The pet storage instance.
      */
     fun getPetStorage(): PetStorage = petStorage
-
-    /**
-     * 獲取模型註冊表。
-     * Gets the model registry.
-     *
-     * @return 模型註冊表實例 / The model registry instance.
-     */
-    fun getModelRegistry(): ModelRegistry = modelRegistry
-
-    /**
-     * 獲取模型渲染引擎。
-     * Gets the model rendering engine.
-     *
-     * @return 模型引擎實例 / The model engine instance.
-     */
-    fun getModelEngine(): ModelEngine = modelEngine
 
     /**
      * 獲取寵物種類註冊表。

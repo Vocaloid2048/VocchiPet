@@ -6,28 +6,18 @@ import java.util.UUID
 /**
  * 寵物介面的基本實作。
  * Basic implementation of the Pet interface.
- *
- * @property uuid 寵物的唯一識別碼 / The unique identifier of the pet.
- * @property ownerId 當前主人的唯一識別碼 / The unique identifier of the current owner.
- * @property tamerId 最初馴養者的唯一識別碼 / The unique identifier of the original tamer.
- * @property type 寵物類型 / The type of the pet.
- * @property level 寵物等級 / The level of the pet.
- * @property exp 寵物經驗值 / The experience points of the pet.
- * @property affection 寵物好感度 / The affection level of the pet.
- * @property element 寵物元素屬性 / The elemental attribute of the pet.
- * @property stats 寵物屬性結構 / The stats structure of the pet.
  */
 data class PetImpl(
     private val uuid: UUID,
     private var ownerId: UUID,
     private val tamerId: UUID,
     private val type: String,
+    private var name: String,
     private var level: Int,
     private var exp: Int,
     private var affection: Double,
-    private var element: Element,
     private var stats: PetStats,
-    private var streaming: Boolean = false
+    private var subspecies: Boolean = false
 ) : Pet {
 
     companion object {
@@ -48,22 +38,27 @@ data class PetImpl(
                 defense = baseStats.defense.copy(potential = quality),
                 speed = baseStats.speed.copy(potential = quality),
                 focus = baseStats.focus.copy(potential = quality),
-                availableTp = 0,
-                skills = arrayOfNulls(6)
+                skills = arrayOfNulls(4)
             )
             return PetImpl(
                 uuid = UUID.randomUUID(),
                 ownerId = ownerId,
                 tamerId = ownerId,
                 type = species.id,
+                name = species.displayName,
                 level = 1,
                 exp = 0,
-                affection = 20.0, // 初始好感度：普通
-                element = species.element,
+                affection = 20.0,
                 stats = stats,
-                streaming = false
+                subspecies = false
             )
         }
+    }
+
+    override fun getName(): String = name
+
+    override fun setName(name: String) {
+        this.name = name
     }
 
     override fun getUniqueId(): UUID = uuid
@@ -96,17 +91,11 @@ data class PetImpl(
         this.affection = affection
     }
 
-    override fun getElement(): Element = element
-
-    fun setElement(element: Element) {
-        this.element = element
-    }
-
     override fun getStats(): PetStats = stats
 
-    override fun isStreaming(): Boolean = streaming
+    override fun isSubspecies(): Boolean = subspecies
 
-    override fun setStreaming(streaming: Boolean) {
-        this.streaming = streaming
+    override fun setSubspecies(subspecies: Boolean) {
+        this.subspecies = subspecies
     }
 }
