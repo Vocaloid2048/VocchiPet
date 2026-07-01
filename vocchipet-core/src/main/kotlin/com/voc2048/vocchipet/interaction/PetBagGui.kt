@@ -112,6 +112,11 @@ class PetBagGui(private val plugin: VocchiPet) {
         lore.add(formatStatLore("速度", stats.speed))
         lore.add(formatStatLore("專注", stats.focus))
         lore.add(" ")
+        
+        val maxHp = com.voc2048.vocchipet.core.util.PetStatCalculator.calculateMaxHp(pet)
+        val currentHp = if (pet.getCurrentHp() < 0) maxHp else pet.getCurrentHp()
+        lore.add("§7當前狀態: §f血量 §e${"%.1f".format(currentHp)} / ${"%.1f".format(maxHp)}")
+
         lore.add("§7好感度: §d${"%.1f".format(pet.getAffection())}")
         lore.add(" ")
         lore.add("§e點擊召喚寵物")

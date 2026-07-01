@@ -4,8 +4,11 @@ import com.voc2048.vocchipet.VocchiPet
 import com.voc2048.vocchipet.api.Tier
 import com.voc2048.vocchipet.PetImpl
 import com.voc2048.vocchipet.ai.FollowOwnerGoal
+import com.voc2048.vocchipet.core.util.PetStatCalculator
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -39,6 +42,11 @@ class GuiListener(
                 Material.NAME_TAG -> {
                     player.closeInventory()
                     startRenaming(player)
+                }
+                Material.REDSTONE_BLOCK -> {
+                    plugin.getPetManager().removeSummonedPet(player.uniqueId)
+                    player.sendMessage("§a已收回寵物。")
+                    player.closeInventory()
                 }
                 Material.BARRIER -> player.closeInventory()
                 else -> {}
@@ -85,8 +93,24 @@ class GuiListener(
                 val entity = player.world.spawnEntity(player.location, species.entityType) as? Mob ?: return@Runnable
                 
                 // 設定屬性
-                entity.customName = pet.getName()
+                entity.customName(Component.text(pet.getName()))
                 entity.isCustomNameVisible = true
+
+                // 應用屬性數值
+                val maxHp = PetStatCalculator.calculateMaxHp(pet)
+                val attack = PetStatCalculator.calculateAttack(pet)
+                val defense = PetStatCalculator.calculateDefense(pet)
+
+                entity.getAttribute(Attribute.MAX_HEALTH)?.baseValue = maxHp
+                entity.getAttribute(Attribute.ATTACK_DAMAGE)?.baseValue = attack
+                entity.getAttribute(Attribute.ARMOR)?.baseValue = defense
+                
+                // 恢復血量
+                if (pet.getCurrentHp() > 0) {
+                    entity.health = pet.getCurrentHp().coerceIn(1.0, maxHp)
+                } else {
+                    entity.health = maxHp
+                }
                 
                 // 注入 AI (簡單 tick 任務)
                 val followGoal = FollowOwnerGoal(entity, player)
@@ -127,7 +151,7 @@ class GuiListener(
         val entity = plugin.getPetManager().getSummonedEntity(player.uniqueId)
         
         pet.setName(name)
-        entity?.customName = name
+        entity?.customName(Component.text(name))
         
         plugin.getPetStorage().savePet(pet).thenAccept {
             player.sendMessage("§a寵物暱稱已成功修改為：$name")
@@ -230,7 +254,8 @@ class GuiListener(
             exp = 0,
             affection = 20.0,
             stats = stats,
-            subspecies = subspecies
+            subspecies = subspecies,
+            currentHp = -1.0
         )
     }
 }

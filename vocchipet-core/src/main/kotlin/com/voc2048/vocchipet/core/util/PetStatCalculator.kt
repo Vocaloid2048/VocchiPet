@@ -29,7 +29,7 @@ object PetStatCalculator {
      */
     fun calculateStat(component: StatComponent, level: Int, coefficient: Double): Double {
         val tierValue = component.potential.ordinal // TIER_0 to TIER_15
-        val baseValue = component.baseValue.toDouble()
+        val baseValue = component.base.toDouble()
         val levelFactor = 1.0 + (level - 1) * 0.1
         return (baseValue + tierValue * coefficient) * levelFactor
     }

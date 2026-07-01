@@ -91,7 +91,8 @@ object PetAdminParser {
             exp = 0,
             affection = 20.0,
             stats = stats,
-            subspecies = subspecies
+            subspecies = subspecies,
+            currentHp = -1.0
         )
     }
 }
