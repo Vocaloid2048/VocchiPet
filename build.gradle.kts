@@ -21,8 +21,19 @@ subprojects {
         jvmToolchain(25)
     }
 
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+    }
+
     dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        testImplementation(kotlin("test"))
+        testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 }
 

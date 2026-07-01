@@ -1,0 +1,58 @@
+# VocchiPet 野生寵物刷新配置
+# VocchiPet Wild Pet Spawner Configuration
+
+# 生態域配置
+# Biome configurations
+biomes:
+  # 平原生態域
+  # Plains Biome
+  PLAINS:
+    # 各稀有度類別的基礎生成機率 (百分比，總和建議為 100.0)
+    # Base spawn chances for each rarity category (Percentage, sum should be 100.0)
+    rarity-chances:
+      COMMON: 70.0
+      UNCOMMON: 20.0
+      RARE: 7.0
+      EPIC: 2.5
+      LEGENDARY: 0.4
+      MYTHICAL: 0.1
+    # 各稀有度類別內的寵物權重
+    # Pet weights within each rarity category
+    spawn-groups:
+      COMMON:
+        "slime_green": 100
+        "rabbit_brown": 50
+      UNCOMMON:
+        "fox_red": 10
+      RARE:
+        "wolf_grey": 5
+      EPIC:
+        "dragon_baby": 1
+      LEGENDARY:
+        "phoenix_young": 1
+      MYTHICAL:
+        "void_spirit": 1
+
+  # 沙漠生態域
+  # Desert Biome
+  DESERT:
+    rarity-chances:
+      COMMON: 60.0
+      UNCOMMON: 25.0
+      RARE: 10.0
+      EPIC: 4.0
+      LEGENDARY: 0.9
+      MYTHICAL: 0.1
+    spawn-groups:
+      COMMON:
+        "scorpio_sand": 100
+      UNCOMMON:
+        "snake_desert": 50
+      RARE:
+        "mummy_cat": 10
+      EPIC:
+        "sand_storm_elemental": 5
+      LEGENDARY:
+        "anubis_shadow": 1
+      MYTHICAL:
+        "sphinx_riddle": 1
