@@ -1,0 +1,6 @@
+name: VocchiPet
+version: '${version}'
+
+main: com.voc2048.vocchiPet.VocchiPet
+api-version: '26.1.2'
+load: POSTWORLD
