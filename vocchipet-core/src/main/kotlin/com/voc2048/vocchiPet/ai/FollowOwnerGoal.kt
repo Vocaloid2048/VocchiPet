@@ -15,8 +15,8 @@ import com.destroystokyo.paper.entity.Pathfinder
 class FollowOwnerGoal(private val mob: Mob, private val owner: Player) {
 
     /**
-     * 檢查並更新跟隨邏輯。
-     * Checks and updates the follow logic.
+     * 檢查並更新跟隨與閒置行為。
+     * Checks and updates the follow and idle behaviors.
      */
     fun tick() {
         val distance = mob.location.distanceSquared(owner.location)
@@ -27,13 +27,21 @@ class FollowOwnerGoal(private val mob: Mob, private val owner: Player) {
             return
         }
 
-        // 距離大於 16 格時開始移動 / Move if distance > 16
+        // 距離大於 16 格時跟隨主人 / Follow owner if distance > 16
         if (distance > 16 * 16) {
             mob.pathfinder.moveTo(owner.location)
         }
-        // 距離小於 6 格時停止 / Stop if distance < 6
+        // 距離小於 6 格時閒置或停止 / Idle or stop if distance < 6
         else if (distance < 6 * 6) {
             mob.pathfinder.stopPathfinding()
+        }
+        // 閒置時隨機走動並避開危險 / Roam randomly while avoiding hazards
+        else {
+            // Paper 的 Pathfinder 會自動考慮 Block 的路徑消耗，
+            // 系統預設應避開岩漿、火、虛空等。
+            mob.pathfinder.moveTo(mob.location.add(
+                (Math.random() * 4 - 2), 0.0, (Math.random() * 4 - 2)
+            ))
         }
     }
 }
