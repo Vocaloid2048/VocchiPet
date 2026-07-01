@@ -48,7 +48,7 @@ class CaptureListener(private val plugin: VocchiPet) : Listener {
         event.isCancelled = true
         projectile.remove()
 
-        val maxHp = target.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
+        val maxHp = target.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
         val successRate = CapsuleManager.calculateCaptureRate(target.health, maxHp, tier)
         
         if (Random.nextDouble() <= successRate) {
@@ -105,7 +105,7 @@ class CaptureListener(private val plugin: VocchiPet) : Listener {
     private fun handleCaptureFailure(player: Player, target: LivingEntity) {
         // 失敗特效 (膠囊破碎)
         // Failure effects (capsule break)
-        target.world.spawnParticle(Particle.ITEM_CRACK, target.location.add(0.0, 1.0, 0.0), 10, ItemStack(Material.GLASS))
+        target.world.spawnParticle(Particle.ITEM, target.location.add(0.0, 1.0, 0.0), 10, ItemStack(Material.GLASS))
         target.world.playSound(target.location, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f)
 
         // 野生動物產生仇恨
