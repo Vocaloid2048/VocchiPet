@@ -10,15 +10,14 @@ You must strictly follow this Git branch and commit strategy. **Never work direc
 
 ### 🌿 Branch Naming Strategy
 
-* **Feature Branches:** `feat-<feature-name>` (e.g., `feat-storage-sqlite`, `feat-ai-harvester`)
-* **Testing Branches:** `test-<component-name>` (e.g., `test-packet-display`)
+* **Core Feature Branches:** `feat-<core-module>` (e.g., `feat-storage-system`, `feat-combat-engine`)
 * **Pre-release Branches:** `pre-release`
 * **Version-specific Branches:** `<mc-version>` (e.g., `1.21`, `1.21.1`)
 
 ### 🔄 Workflow Execution Loop
 
-1. **Isolate:** Request or verify that you are on a dedicated feature/test branch before writing code.
-2. **Micro-Commits:** Commit **every time a micro-feature or method is successfully completed and verified**.
+1. **Isolate:** Create a dedicated branch only when developing a complete, large-scale core module. For minor tasks, stay on the current core feature branch.
+2. **Micro-Commits:** Within the feature branch, you MUST commit **every time a micro-feature, method, or unit test is successfully completed and verified**.
 3. **Merge:** Only merge into parent branches (`pre-release` or `main`) after thorough local compilation and confirmation from the User.
 
 ### 📝 Commit Message Format
