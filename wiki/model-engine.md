@@ -12,25 +12,39 @@
 
 ## 🛠️ API 使用說明
 
+### 模型註冊 (Model Registration)
+在生成寵物前，需先將模型映射至註冊表。系統會自動將鍵值轉為標準化格式（大寫且移除空格）。
+
+```kotlin
+import com.voc2048.vocchiPet.render.DefaultModelRegistry
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
+
+val registry = DefaultModelRegistry()
+val item = ItemStack(Material.PAPER)
+val meta = item.itemMeta
+meta?.setCustomModelData(1001)
+item.itemMeta = meta
+
+// 註冊為 FIREBIRD (輸入 "Fire Bird" 也會自動轉為 "FIREBIRD")
+registry.registerModel("Fire Bird", item)
+```
+
 ### 獲取渲染引擎實作
 ```kotlin
 import com.voc2048.vocchiPet.render.PetSpawnManager
 import com.voc2048.vocchipet.api.render.ModelEngine
 
-// 透過介面 ModelEngine 進行操作
-val modelEngine: ModelEngine = PetSpawnManager()
+// 傳入註冊表以初始化引擎
+val modelEngine: ModelEngine = PetSpawnManager(registry)
 ```
 
 ### 生成寵物模型
 ```kotlin
 val location = player.location
-val item = ItemStack(Material.PAPER)
-val meta = item.itemMeta
-meta?.setCustomModelData(1001) // 設置您的自定義模型 ID
-item.itemMeta = meta
 
-// 在指定座標生成模型
-val display = modelEngine.spawnModel(location, item)
+// 直接使用字串鍵值生成，引擎會自動從註冊表查找對應物品
+val display = modelEngine.spawnModel(location, "FIREBIRD")
 ```
 
 ### 動態更新面向
@@ -40,6 +54,11 @@ modelEngine.updateRotation(display, player.location.yaw, player.location.pitch)
 ```
 
 ## 🏗️ 實作細節
-- **介面定義**：`com.voc2048.vocchipet.api.render.ModelEngine`
-- **核心實作**：`com.voc2048.vocchiPet.render.PetSpawnManager`
+- **介面定義**：
+  - `com.voc2048.vocchipet.api.render.ModelEngine`
+  - `com.voc2048.vocchipet.api.render.ModelRegistry`
+- **核心實作**：
+  - `com.voc2048.vocchiPet.render.PetSpawnManager`
+  - `com.voc2048.vocchiPet.render.DefaultModelRegistry`
+- **持久化儲存**：模型映射關係可透過 `ModelStorage` 介面儲存於 SQLite 資料庫中。
 - **技術選型**：使用 `org.bukkit.entity.ItemDisplay` 以獲得最佳的 3D 模型展示效果與性能表現。

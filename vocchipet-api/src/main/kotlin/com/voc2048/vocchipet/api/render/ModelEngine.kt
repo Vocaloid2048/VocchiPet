@@ -2,7 +2,6 @@ package com.voc2048.vocchipet.api.render
 
 import org.bukkit.Location
 import org.bukkit.entity.ItemDisplay
-import org.bukkit.inventory.ItemStack
 
 /**
  * 寵物模型渲染引擎介面，負責處理基於 Display Entity 的模型生成與外觀更新。
@@ -15,10 +14,10 @@ interface ModelEngine {
      * Spawns a pet model entity at the specified location.
      *
      * @param location 生成座標 / The location to spawn the model.
-     * @param itemStack 模型所使用的物品（包含 CustomModelData） / The item stack used for the model (includes CustomModelData).
-     * @return 生成的 ItemDisplay 實體 / The spawned ItemDisplay entity.
+     * @param modelKey 模型的識別鍵值（如 FIREBIRD） / The identification key of the model (e.g., FIREBIRD).
+     * @return 生成的 ItemDisplay 實體，若找不到模型則可能拋出異常或返回 null / The spawned ItemDisplay entity, or null if the model is not found.
      */
-    fun spawnModel(location: Location, itemStack: ItemStack): ItemDisplay
+    fun spawnModel(location: Location, modelKey: String): ItemDisplay?
 
     /**
      * 更新模型實體的旋轉角度。

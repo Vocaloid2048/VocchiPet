@@ -2,8 +2,11 @@ package com.voc2048.vocchiPet.storage
 
 import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Pet
+import com.voc2048.vocchipet.api.storage.ModelStorage
 import com.voc2048.vocchipet.api.storage.PetStorage
 import com.voc2048.vocchiPet.PetImpl
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager
@@ -14,8 +17,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
 /**
- * 使用 SQLite 實作的寵物數據儲存器。
- * Pet data storage implementation using SQLite.
+ * 使用 SQLite 實作的數據儲存器，包含寵物數據與模型映射。
+ * Data storage implementation using SQLite, including pet data and model mappings.
  *
  * @property dbFile SQLite 資料庫檔案 / The SQLite database file.
  * @property executor 用於執行非同步任務的執行器 / Executor for running asynchronous tasks.
@@ -23,7 +26,7 @@ import java.util.concurrent.Executor
 class SqlitePetStorage(
     private val dbFile: File,
     private val executor: Executor
-) : PetStorage {
+) : PetStorage, ModelStorage {
 
     private val url = "jdbc:sqlite:${dbFile.absolutePath}"
 
@@ -56,6 +59,11 @@ class SqlitePetStorage(
                         exp INTEGER NOT NULL,
                         affection REAL NOT NULL,
                         element TEXT NOT NULL
+                    );
+                    CREATE TABLE IF NOT EXISTS vocchipet_models (
+                        model_key TEXT PRIMARY KEY,
+                        material TEXT NOT NULL,
+                        custom_model_data INTEGER NOT NULL
                     );
                 """.trimIndent()
                 conn.createStatement().execute(sql)
@@ -134,6 +142,49 @@ class SqlitePetStorage(
                 }
             }
             pets
+        }, executor)
+    }
+
+    /**
+     * 非同步儲存模型映射。
+     * Asynchronously saves a model mapping.
+     */
+    override fun saveModelMapping(key: String, itemStack: ItemStack): CompletableFuture<Void> {
+        return CompletableFuture.runAsync({
+            getConnection().use { conn ->
+                val sql = "INSERT OR REPLACE INTO vocchipet_models (model_key, material, custom_model_data) VALUES (?, ?, ?);"
+                val pstmt = conn.prepareStatement(sql)
+                pstmt.setString(1, key)
+                pstmt.setString(2, itemStack.type.name)
+                val meta = itemStack.itemMeta
+                pstmt.setInt(3, if (meta != null && meta.hasCustomModelData()) meta.customModelData else 0)
+                pstmt.executeUpdate()
+            }
+        }, executor)
+    }
+
+    /**
+     * 非同步讀取所有模型映射。
+     * Asynchronously loads all model mappings.
+     */
+    override fun loadAllModels(): CompletableFuture<Map<String, ItemStack>> {
+        return CompletableFuture.supplyAsync({
+            val models = mutableMapOf<String, ItemStack>()
+            getConnection().use { conn ->
+                val sql = "SELECT * FROM vocchipet_models;"
+                val rs = conn.createStatement().executeQuery(sql)
+                while (rs.next()) {
+                    val key = rs.getString("model_key")
+                    val material = Material.valueOf(rs.getString("material"))
+                    val customModelData = rs.getInt("custom_model_data")
+                    val item = ItemStack(material)
+                    val meta = item.itemMeta
+                    meta?.setCustomModelData(customModelData)
+                    item.itemMeta = meta
+                    models[key] = item
+                }
+            }
+            models
         }, executor)
     }
 
