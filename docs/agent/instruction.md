@@ -8,17 +8,23 @@
 
 You must strictly follow this Git branch and commit strategy. **Never work directly on the production branch.**
 
-### 🌿 Branch Naming Strategy
+### 🌿 Branch Naming & Merge Strategy
 
-* **Core Feature Branches:** `feat-<core-module>` (e.g., `feat-storage-system`, `feat-combat-engine`)
-* **Pre-release Branches:** `pre-release`
-* **Version-specific Branches:** `<mc-version>` (e.g., `1.21`, `1.21.1`)
+* **production:** 最新支援的 Minecraft 版本 - 穩定插件版本。
+* **`<mc-version>` (e.g., 1.21.1):** 指定 Minecraft 版本 - 穩定插件版本。
+* **dev:** 最新支援的 Minecraft 版本 - 開發中插件版本。
+* **`<mc-version>-dev` (e.g., 1.21.1-dev):** 指定 Minecraft 版本 - 開發中插件版本。
+* **`feat-<core-module>`:** 功能開發分支 (e.g., `feat-storage-system`)。
+
+### 🔄 Merge Workflow (PR Logic)
+
+`feat-xxx` $\rightarrow$ `<mc-version>-dev` / `dev` $\rightarrow$ `<mc-version>` / `production`
 
 ### 🔄 Workflow Execution Loop
 
 1. **Isolate:** Create a dedicated branch only when developing a complete, large-scale core module. For minor tasks, stay on the current core feature branch.
 2. **Micro-Commits:** Within the feature branch, you MUST commit **every time a micro-feature, method, or unit test is successfully completed and verified**.
-3. **Merge:** Only merge into parent branches (`pre-release` or `main`) after thorough local compilation and confirmation from the User.
+3. **Merge:** Follow the PR logic above to merge code into development branches, and finally into production branches, only after thorough local compilation and confirmation.
 
 ### 📝 Commit Message Format
 
