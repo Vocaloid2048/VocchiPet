@@ -1,5 +1,6 @@
 package com.voc2048.vocchipet.storage
 
+import com.google.gson.Gson
 import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Pet
 import com.voc2048.vocchipet.api.PetStats
@@ -32,6 +33,7 @@ class SqlitePetStorage(
 ) : PetStorage, ModelStorage {
 
     private val url = "jdbc:sqlite:${dbFile.absolutePath}"
+    private val gson = Gson()
 
     /**
      * 獲取資料庫連接。
@@ -124,8 +126,7 @@ class SqlitePetStorage(
                 pstmt.setDouble(7, pet.getAffection())
                 pstmt.setString(8, pet.getElement().name)
                 pstmt.setInt(9, if (pet.isStreaming()) 1 else 0)
-                // TODO: 序列化 stats 為 JSON
-                pstmt.setString(10, "{}")
+                pstmt.setString(10, gson.toJson(pet.getStats()))
                 pstmt.executeUpdate()
             }
         }, executor)
@@ -228,16 +229,21 @@ class SqlitePetStorage(
      * @return 寵物實例 / The pet instance.
      */
     private fun mapResultSetToPet(rs: ResultSet): Pet {
-        // TODO: 解析 JSON 數據 / Parse JSON data
-        val stats = PetStats(
-            hp = StatComponent(0, Tier.D, 0),
-            attack = StatComponent(0, Tier.D, 0),
-            defense = StatComponent(0, Tier.D, 0),
-            speed = StatComponent(0, Tier.D, 0),
-            focus = StatComponent(0, Tier.D, 0),
-            availableTp = 0,
-            skills = arrayOfNulls<String>(6)
-        )
+        val statsJson = rs.getString("stats_json")
+        val stats = try {
+            gson.fromJson(statsJson, PetStats::class.java)
+        } catch (e: Exception) {
+            // 回退機制：若解析失敗則使用預設值
+            PetStats(
+                hp = StatComponent(0, Tier.D, 0),
+                attack = StatComponent(0, Tier.D, 0),
+                defense = StatComponent(0, Tier.D, 0),
+                speed = StatComponent(0, Tier.D, 0),
+                focus = StatComponent(0, Tier.D, 0),
+                availableTp = 0,
+                skills = arrayOfNulls<String>(6)
+            )
+        }
         return PetImpl(
             uuid = UUID.fromString(rs.getString("pet_uuid")),
             ownerId = UUID.fromString(rs.getString("owner_uuid")),

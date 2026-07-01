@@ -1,9 +1,7 @@
 package com.voc2048.vocchipet.interaction
 
 import com.google.gson.Gson
-import com.voc2048.vocchipet.PetImpl
 import com.voc2048.vocchipet.VocchiPet
-import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Tier
 import org.bukkit.Bukkit
 import java.util.UUID
@@ -26,10 +24,8 @@ class PetCommandExecutor(
     private val plugin: VocchiPet,
     private val bagGui: PetBagGui,
     private val mainMenuGui: MainMenuGui,
-    private val constructionGui: PetConstructionMasterGui
+    private val constructionGui: PetConstructionMasterGui,
 ) : CommandExecutor, TabCompleter {
-
-    private val gson = Gson()
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) {
@@ -92,7 +88,7 @@ class PetCommandExecutor(
                 // 解析參數
                 val paramStr = args.slice(4 until args.size).joinToString(" ")
                 try {
-                    val newPet = parseAndCreatePet(species, target.uniqueId, paramStr)
+                    val newPet = PetAdminParser.parseAndCreatePet(species, target.uniqueId, paramStr)
                     plugin.getPetStorage().savePet(newPet).thenAccept {
                         player.sendMessage("§a已成功賦予 ${target.name} 一隻 ${species.displayName} (自定義參數)")
                         target.sendMessage("§a管理員賦予了你一隻 ${species.displayName}！")
@@ -121,45 +117,6 @@ class PetCommandExecutor(
             }
             else -> player.sendMessage("§c未知管理指令。")
         }
-    }
-
-    private fun parseAndCreatePet(species: com.voc2048.vocchipet.api.PetSpecies, ownerId: UUID, paramStr: String): PetImpl {
-        // 預設值
-        var level = 1
-        var tier = Tier.D
-        var element = species.element
-        var streaming = false
-
-        if (paramStr.startsWith("{") && paramStr.endsWith("}")) {
-            // JSON 格式
-            val map = gson.fromJson(paramStr, Map::class.java)
-            map["level"]?.let { level = (it as Double).toInt() }
-            map["tier"]?.let { tier = Tier.valueOf(it.toString().uppercase()) }
-            map["element"]?.let { element = Element.valueOf(it.toString().uppercase()) }
-            map["shinny"]?.let { streaming = it as Boolean }
-            map["shiny"]?.let { streaming = it as Boolean }
-        } else {
-            // 鍵值對格式: level=50 tier=UR element=FIRE shinny=true
-            val pairs = paramStr.split(" ")
-            for (pair in pairs) {
-                val kv = pair.split("=")
-                if (kv.size != 2) continue
-                val key = kv[0].lowercase()
-                val value = kv[1]
-                when (key) {
-                    "level" -> level = value.toInt()
-                    "tier" -> tier = Tier.valueOf(value.uppercase())
-                    "element" -> element = Element.valueOf(value.uppercase())
-                    "shinny", "shiny" -> streaming = value.toBoolean()
-                }
-            }
-        }
-
-        val pet = PetImpl.create(species, ownerId, tier)
-        pet.setLevel(level)
-        pet.setElement(element)
-        pet.setStreaming(streaming)
-        return pet
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {

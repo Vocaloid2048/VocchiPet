@@ -83,8 +83,8 @@ class GuiListener(
         val slot = event.rawSlot
         val currentItem = event.currentItem ?: return
 
-        // 從隱藏位置獲取目標資訊 (Slot 53)
-        val targetInfoItem = inv.getItem(53) ?: return
+        // 從隱藏位置獲取目標資訊 (Slot 2)
+        val targetInfoItem = inv.getItem(2) ?: return
         val targetInfoStr = targetInfoItem.itemMeta?.displayName ?: return
         if (!targetInfoStr.startsWith("§fTARGET:")) return
         
@@ -94,74 +94,122 @@ class GuiListener(
         val targetPlayer = Bukkit.getPlayer(targetUUID) ?: return
         val species = plugin.getSpeciesRegistry().getSpecies(speciesID) ?: return
 
-        // 獲取當前數值
-        val levelItem = inv.getItem(12) ?: return
-        var currentLevel = levelItem.itemMeta?.displayName?.filter { it.isDigit() }?.toIntOrNull() ?: 1
+        // 獲取當前基礎數值
+        val levelItem = inv.getItem(5) ?: return
+        var currentLevel = levelItem.itemMeta?.displayName?.substringAfter(": §f")?.toIntOrNull() ?: 1
         
-        val streamingItem = inv.getItem(19) ?: return
+        val streamingItem = inv.getItem(0) ?: return
         var isStreaming = streamingItem.itemMeta?.displayName?.contains("開啟") == true
 
-        val elementItem = inv.getItem(20) ?: return
-        var currentElement = Element.valueOf(elementItem.itemMeta?.displayName?.substringAfter(": §f") ?: species.element.name)
+        val elementItem = inv.getItem(1) ?: return
+        var currentElement = com.voc2048.vocchipet.api.Element.valueOf(elementItem.itemMeta?.displayName?.substringAfter(": §f") ?: species.element.name)
 
-        val tierItem = inv.getItem(21) ?: return
-        var currentTier = Tier.valueOf(tierItem.itemMeta?.displayName?.substringAfter(": §f") ?: "D")
-
+        // 處理點擊
         when (slot) {
-            10 -> currentLevel = (currentLevel - 10).coerceAtLeast(1)
-            11 -> currentLevel = (currentLevel - 1).coerceAtLeast(1)
-            13 -> currentLevel = (currentLevel + 1).coerceAtMost(100)
-            14 -> currentLevel = (currentLevel + 10).coerceAtMost(100)
-            19 -> isStreaming = !isStreaming
-            20 -> {
-                val elements = Element.entries
+            0 -> isStreaming = !isStreaming
+            1 -> {
+                val elements = com.voc2048.vocchipet.api.Element.entries
                 val nextIdx = (elements.indexOf(currentElement) + 1) % elements.size
                 currentElement = elements[nextIdx]
             }
-            21 -> {
-                val tiers = Tier.entries
-                val nextIdx = (tiers.indexOf(currentTier) + 1) % tiers.size
-                currentTier = tiers[nextIdx]
-            }
-            49 -> {
+            3 -> currentLevel = (currentLevel - 10).coerceAtLeast(1)
+            4 -> currentLevel = (currentLevel - 1).coerceAtLeast(1)
+            6 -> currentLevel = (currentLevel + 1).coerceAtMost(100)
+            7 -> currentLevel = (currentLevel + 10).coerceAtMost(100)
+            8 -> {
                 // 確認生成
-                val newPet = PetImpl.create(species, targetUUID, currentTier)
-                newPet.setLevel(currentLevel)
-                newPet.setElement(currentElement)
-                newPet.setStreaming(isStreaming)
-
+                val newPet = createPetFromGui(species, targetUUID, inv, currentLevel, isStreaming, currentElement)
                 plugin.getPetStorage().savePet(newPet).thenAccept {
                     admin.sendMessage("§a已成功通過構造大師為 ${targetPlayer.name} 生成寵物！")
                     targetPlayer.sendMessage("§a管理員贈送了你一隻特別的 ${species.displayName}！")
-                    admin.closeInventory()
+                    Bukkit.getScheduler().runTask(plugin, Runnable { admin.closeInventory() })
                 }
                 return
             }
         }
 
-        // 更新 GUI
-        updateConstructionGui(inv, currentLevel, isStreaming, currentElement, currentTier)
+        // 處理五維點擊 (Row 1-5)
+        if (slot in 9..53) {
+            val rowStart = (slot / 9) * 9
+            val subSlot = slot % 9
+            
+            if (subSlot == 2) {
+                // IT 切換
+                val itItem = inv.getItem(slot) ?: return
+                val currentTier = Tier.valueOf(itItem.itemMeta?.displayName?.substringAfter(": §f") ?: "D")
+                val tiers = Tier.entries
+                val nextTier = tiers[(tiers.indexOf(currentTier) + 1) % tiers.size]
+                val meta = itItem.itemMeta
+                meta?.setDisplayName("§e資質 (IT): §f$nextTier")
+                itItem.itemMeta = meta
+            } else if (subSlot in listOf(4, 5, 7, 8)) {
+                // AT 調整
+                val infoItem = inv.getItem(rowStart + 6) ?: return
+                var currentAt = infoItem.itemMeta?.displayName?.substringAfter(": §f")?.toIntOrNull() ?: 0
+                val delta = when (subSlot) {
+                    4 -> -5
+                    5 -> -1
+                    7 -> 1
+                    8 -> 5
+                    else -> 0
+                }
+                currentAt = (currentAt + delta).coerceAtLeast(0)
+                val meta = infoItem.itemMeta
+                meta?.setDisplayName("§b訓練 (AT): §f$currentAt")
+                infoItem.itemMeta = meta
+            }
+        }
+
+        // 更新基礎 GUI
+        val lvItem = inv.getItem(5)
+        val lvMeta = lvItem?.itemMeta
+        lvMeta?.setDisplayName("§e等級: §f$currentLevel")
+        lvItem?.itemMeta = lvMeta
+
+        val sItem = inv.getItem(0)
+        val sMeta = sItem?.itemMeta
+        sMeta?.setDisplayName("§b流光狀態: ${if (isStreaming) "§a開啟" else "§7關閉"}")
+        sItem?.itemMeta = sMeta
+
+        val eItem = inv.getItem(1)
+        val eMeta = eItem?.itemMeta
+        eMeta?.setDisplayName("§6元素屬性: §f$currentElement")
+        eItem?.itemMeta = eMeta
     }
 
-    private fun updateConstructionGui(inv: org.bukkit.inventory.Inventory, level: Int, streaming: Boolean, element: Element, tier: Tier) {
-        val levelItem = inv.getItem(12)
-        val levelMeta = levelItem?.itemMeta
-        levelMeta?.setDisplayName("§e當前等級: §f$level")
-        levelItem?.itemMeta = levelMeta
+    private fun createPetFromGui(
+        species: com.voc2048.vocchipet.api.PetSpecies,
+        ownerId: UUID,
+        inv: org.bukkit.inventory.Inventory,
+        level: Int,
+        streaming: Boolean,
+        element: com.voc2048.vocchipet.api.Element
+    ): PetImpl {
+        fun getTier(row: Int) = Tier.valueOf(inv.getItem(row * 9 + 2)?.itemMeta?.displayName?.substringAfter(": §f") ?: "D")
+        fun getAt(row: Int) = inv.getItem(row * 9 + 6)?.itemMeta?.displayName?.substringAfter(": §f")?.toIntOrNull() ?: 0
 
-        val streamingItem = inv.getItem(19)
-        val streamingMeta = streamingItem?.itemMeta
-        streamingMeta?.setDisplayName("§b流光狀態: ${if (streaming) "§a開啟" else "§7關閉"}")
-        streamingItem?.itemMeta = streamingMeta
+        val baseStats = species.baseStats
+        val stats = com.voc2048.vocchipet.api.PetStats(
+            hp = baseStats.hp.copy(potential = getTier(1), trained = getAt(1)),
+            attack = baseStats.attack.copy(potential = getTier(2), trained = getAt(2)),
+            defense = baseStats.defense.copy(potential = getTier(3), trained = getAt(3)),
+            speed = baseStats.speed.copy(potential = getTier(4), trained = getAt(4)),
+            focus = baseStats.focus.copy(potential = getTier(5), trained = getAt(5)),
+            availableTp = 0,
+            skills = arrayOfNulls(6)
+        )
 
-        val elementItem = inv.getItem(20)
-        val elementMeta = elementItem?.itemMeta
-        elementMeta?.setDisplayName("§6元素屬性: §f$element")
-        elementItem?.itemMeta = elementMeta
-
-        val tierItem = inv.getItem(21)
-        val tierMeta = tierItem?.itemMeta
-        tierMeta?.setDisplayName("§e資質階級: §f$tier")
-        tierItem?.itemMeta = tierMeta
+        return PetImpl(
+            uuid = UUID.randomUUID(),
+            ownerId = ownerId,
+            tamerId = ownerId,
+            type = species.id,
+            level = level,
+            exp = 0,
+            affection = 20.0,
+            element = element,
+            stats = stats,
+            streaming = streaming
+        )
     }
 }

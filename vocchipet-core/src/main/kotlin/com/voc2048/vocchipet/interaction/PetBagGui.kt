@@ -90,13 +90,16 @@ class PetBagGui(private val plugin: VocchiPet) {
         val stats = pet.getStats()
         val lore = mutableListOf<String>()
         lore.add("§7屬性: ${getElementColor(pet.getElement())}${pet.getElement()}")
+        if (pet.isStreaming()) {
+            lore.add("§6✦ 流光亞種 (Streaming) ✦")
+        }
         lore.add(" ")
-        lore.add("§f資質階級:")
-        lore.add(" §7生命: ${getTierColor(stats.hp.potential)}${stats.hp.potential}")
-        lore.add(" §7攻擊: ${getTierColor(stats.attack.potential)}${stats.attack.potential}")
-        lore.add(" §7防禦: ${getTierColor(stats.defense.potential)}${stats.defense.potential}")
-        lore.add(" §7速度: ${getTierColor(stats.speed.potential)}${stats.speed.potential}")
-        lore.add(" §7專注: ${getTierColor(stats.focus.potential)}${stats.focus.potential}")
+        lore.add("§f屬性資質與訓練 (IT/AT):")
+        lore.add(formatStatLore("生命", stats.hp))
+        lore.add(formatStatLore("攻擊", stats.attack))
+        lore.add(formatStatLore("防禦", stats.defense))
+        lore.add(formatStatLore("速度", stats.speed))
+        lore.add(formatStatLore("專注", stats.focus))
         lore.add(" ")
         lore.add("§7剩餘 TP: §e${stats.availableTp}")
         lore.add("§7好感度: §d${"%.1f".format(pet.getAffection())}")
@@ -106,6 +109,11 @@ class PetBagGui(private val plugin: VocchiPet) {
         meta?.lore = lore
         item.itemMeta = meta
         return item
+    }
+
+    private fun formatStatLore(label: String, component: com.voc2048.vocchipet.api.StatComponent): String {
+        val tierColor = getTierColor(component.potential)
+        return " §7$label: $tierColor${component.potential} §8| §bAT: ${component.trained}"
     }
 
     private fun getElementColor(element: Element): String = when (element) {

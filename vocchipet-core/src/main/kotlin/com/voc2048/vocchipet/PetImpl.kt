@@ -26,7 +26,7 @@ data class PetImpl(
     private var exp: Int,
     private var affection: Double,
     private var element: Element,
-    private val stats: PetStats,
+    private var stats: PetStats,
     private var streaming: Boolean = false
 ) : Pet {
 

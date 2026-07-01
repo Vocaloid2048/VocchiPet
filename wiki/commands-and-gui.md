@@ -29,13 +29,17 @@ The main command is `/vocchipet`, with the alias `/vp`.
 
 #### 💡 高級給予語法 (Advanced Give Syntax)
 
-管理員可以在指令後方帶入 JSON 格式或鍵值對格式的參數：
-Admins can use JSON or Key-Value pairs for parameters:
+管理員可以使用 `key=value` 格式指定寵物的詳細參數。未指定的 IT 資質將由系統隨機生成，AT 訓練點數預設為 0。
+Admins can specify pet parameters using `key=value` format. Unspecified IT will be randomized, and AT defaults to 0.
 
-* **JSON 格式:** `/vp admin give Player1 dragon {"level":50,"shinny":true,"tier":"UR","element":"FIRE"}`
-* **鍵值對格式:** `/vp admin give Player1 dragon level=50 shinny=true tier=UR element=FIRE`
+* **範例 (Example):** `/vp admin give Player1 dragon level=50 shinny it_hp=UR at_atk=25 element=WATER`
 
-* **參數支援:** `level`, `tier` (D~UR), `element` (FIRE, WATER, GRASS, LIGHT, DARK), `shinny` (true/false)
+* **支援參數 (Supported Keys):**
+  - `level`: 等級 (1~100)
+  - `shinny` / `shiny`: 旗標參數，設為 true 開啟流光亞種。
+  - `element`: 元素屬性 (FIRE, WATER, GRASS, LIGHT, DARK)
+  - `IT_HP`, `IT_ATK`, `IT_DEF`, `IT_SPD`, `IT_FCS`: 五維先天資質 (D~UR)
+  - `AT_HP`, `AT_ATK`, `AT_DEF`, `AT_SPD`, `AT_FCS`: 五維後天訓練點數
 
 ---
 
@@ -45,24 +49,19 @@ Admins can use JSON or Key-Value pairs for parameters:
 ... (略)
 
 ### 🎒 寵物背包 (Pet Bag)
-... (略)
+* **佈局：** 45 格寵物存放區 + 9 格導航控制欄。
+* **分頁邏輯：** 支援多頁顯示，透過底部「上一頁/下一頁」箭頭切換。
+* **彩色 Lore 展示 (Hover Lore):**
+  * **狀態：** 顯示等級、元素、以及是否為「流光亞種」。
+  * **五維詳細數據：** 每一項屬性都會顯示其 **IT (資質階級)** 與 **AT (訓練投入點數)**。
 
 ### 🛠️ 寵物構造大師 (Pet Construction Master)
 * **開啟方式：** 管理員執行 `/vp admin give <玩家> <寵物ID>` 且不帶參數。
 * **功能：**
-  * **等級調整：** 透過按鈕快速增減等級 (+1/-1/+10/-10)。
-  * **流光切換：** 一鍵切換寵物是否為「流光 (Streaming/Shiny)」亞種。
-  * **元素切換：** 循環切換寵物的五大元素屬性。
-  * **資質切換：** 循環切換資質階級 (D ~ UR)。
-  * **確認生成：** 完成設定後點擊，寵物將直接發放至目標玩家的 `/petbag` 中。
-* **佈局：** 45 格寵物存放區 + 9 格導航控制欄。
-* **分頁邏輯：**
-  * 支援多頁顯示，透過底部「上一頁/下一頁」箭頭切換。
-* **彩色 Lore 展示 (Hover Lore):**
-  * **名字：** 包含等級資訊。
-  * **屬性：** 顯示元素圖示與顏色（火、水、草、光、暗）。
-  * **五維資質：** 以彩色標籤顯示 D 到 UR 的階級。
-  * **數值：** 顯示剩餘 TP 點數與目前好感度。
+  * **基礎設定：** 調整等級、流光狀態、元素屬性。
+  * **五維 IT 調整：** 點擊對應屬性的金錠圖示，循環切換 D ~ UR 階級。
+  * **五維 AT 調整：** 點擊對應屬性旁的紅/綠玻璃，增減訓練點數 (-5, -1, +1, +5)。
+  * **確認生成：** 完成設定後點擊右上角「確認生成並發放」。
 
 ---
 
