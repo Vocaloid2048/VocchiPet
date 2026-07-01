@@ -5,6 +5,9 @@ import com.voc2048.vocchipet.storage.SqlitePetStorage
 import com.voc2048.vocchipet.interaction.*
 import com.voc2048.vocchipet.core.PetSpeciesRegistry
 import com.voc2048.vocchipet.core.PetManager
+import com.voc2048.vocchipet.core.capsule.CapsuleManager
+import com.voc2048.vocchipet.core.capsule.CaptureListener
+import com.voc2048.vocchipet.interaction.*
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Executor
@@ -21,6 +24,7 @@ class VocchiPet : JavaPlugin() {
     
     private lateinit var speciesRegistry: PetSpeciesRegistry
     private lateinit var petManager: PetManager
+    private lateinit var capsuleManager: CapsuleManager
     private lateinit var bagGui: PetBagGui
     private lateinit var mainMenuGui: MainMenuGui
     private lateinit var constructionGui: PetConstructionMasterGui
@@ -39,6 +43,8 @@ class VocchiPet : JavaPlugin() {
 
         // 初始化管理器
         petManager = PetManager()
+        capsuleManager = CapsuleManager(this)
+        capsuleManager.registerRecipes()
 
         // 初始化 GUI
         bagGui = PetBagGui(this)
@@ -63,7 +69,11 @@ class VocchiPet : JavaPlugin() {
         getCommand("vocchipet")?.tabCompleter = commandExecutor
 
         // 註冊事件監聽器
-        server.pluginManager.registerEvents(GuiListener(this, bagGui, mainMenuGui, constructionGui), this)
+        val guiListener = GuiListener(this, bagGui, mainMenuGui, constructionGui)
+        server.pluginManager.registerEvents(guiListener, this)
+        server.pluginManager.registerEvents(CaptureListener(this), this)
+        server.pluginManager.registerEvents(InteractionListener(this, guiListener, mainMenuGui), this)
+        server.pluginManager.registerEvents(CombatListener(this), this)
 
         logger.info("VocchiPet 已啟動！")
     }
@@ -95,4 +105,12 @@ class VocchiPet : JavaPlugin() {
      * @return 寵物管理器實例 / The pet manager instance.
      */
     fun getPetManager(): PetManager = petManager
+
+    /**
+     * 獲取寵物膠囊管理器。
+     * Gets the pet capsule manager.
+     *
+     * @return 膠囊管理器實例 / The capsule manager instance.
+     */
+    fun getCapsuleManager(): CapsuleManager = capsuleManager
 }

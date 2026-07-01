@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.Mockito.mock
-import com.voc2048.vocchipet.VocchiPet
 
 /**
  * 測試寵物膠囊捕捉率公式。
@@ -13,14 +11,11 @@ import com.voc2048.vocchipet.VocchiPet
  */
 class CapsuleManagerTest {
 
-    private val plugin = mock(VocchiPet::class.java)
-    private val capsuleManager = CapsuleManager(plugin)
-
     @Test
     fun `test capture rate when HP is full`() {
         // 當 HP 為 100% 時，成功率應為 0
         // When HP is 100%, success rate should be 0
-        val rate = capsuleManager.calculateCaptureRate(100.0, 100.0, CapsuleTier.ULTRA)
+        val rate = CapsuleManager.calculateCaptureRate(100.0, 100.0, CapsuleTier.ULTRA)
         assertEquals(0.0, rate, 0.001)
     }
 
@@ -33,8 +28,8 @@ class CapsuleManagerTest {
         "0.0, 100.0, REGULAR, 1.0"
     )
     fun `test capture rate with different HP and tiers`(currentHp: Double, maxHp: Double, tierId: String, expected: Double) {
-        val tier = CapsuleTier.values().find { it.name == tierId }!!
-        val rate = capsuleManager.calculateCaptureRate(currentHp, maxHp, tier)
+        val tier = CapsuleTier.entries.find { it.name == tierId }!!
+        val rate = CapsuleManager.calculateCaptureRate(currentHp, maxHp, tier)
         assertEquals(expected, rate, 0.001)
     }
 }
