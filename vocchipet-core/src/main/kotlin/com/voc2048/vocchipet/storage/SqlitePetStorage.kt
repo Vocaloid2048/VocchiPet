@@ -40,8 +40,7 @@ class SqlitePetStorage(
      * @return 資料庫連接物件 / The database connection object.
      */
     private fun getConnection(): Connection {
-        // 確保連結採用 UTF-8 / Ensure connection uses UTF-8
-        return DriverManager.getConnection("$url?useUnicode=true&characterEncoding=UTF-8")
+        return DriverManager.getConnection(url)
     }
 
     /**

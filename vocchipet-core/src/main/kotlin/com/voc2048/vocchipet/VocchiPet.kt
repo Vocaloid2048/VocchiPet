@@ -7,7 +7,9 @@ import com.voc2048.vocchipet.api.storage.PetStorage
 import com.voc2048.vocchipet.render.DefaultModelRegistry
 import com.voc2048.vocchipet.render.PetSpawnManager
 import com.voc2048.vocchipet.storage.SqlitePetStorage
-import com.voc2048.vocchipet.interaction.PetCommandExecutor
+import com.voc2048.vocchipet.interaction.*
+import com.voc2048.vocchipet.core.PetSpeciesRegistry
+import com.voc2048.vocchipet.core.PetManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Executor
@@ -24,12 +26,30 @@ class VocchiPet : JavaPlugin() {
     private lateinit var modelRegistry: ModelRegistry
     private lateinit var modelEngine: ModelEngine
     private lateinit var databaseExecutor: Executor
+    
+    private lateinit var speciesRegistry: PetSpeciesRegistry
+    private lateinit var petManager: PetManager
+    private lateinit var bagGui: PetBagGui
+    private lateinit var mainMenuGui: MainMenuGui
 
     override fun onEnable() {
         // 初始化非同步執行器
         databaseExecutor = Executors.newSingleThreadExecutor { runnable ->
             Thread(runnable, "VocchiPet-Database-Thread")
         }
+
+        // 初始化種類註冊表與資料
+        speciesRegistry = PetSpeciesRegistry()
+        com.voc2048.vocchipet.core.TestData.getTestSpecies().forEach {
+            speciesRegistry.register(it)
+        }
+
+        // 初始化管理器
+        petManager = PetManager()
+
+        // 初始化 GUI
+        bagGui = PetBagGui(this)
+        mainMenuGui = MainMenuGui(this)
 
         // 初始化儲存器與註冊表
         val dbFile = File(dataFolder, "storage.db")
@@ -54,14 +74,19 @@ class VocchiPet : JavaPlugin() {
             null
         }
 
-        getCommand("vocchipet")?.setExecutor(PetCommandExecutor(this))
+        // 註冊指令
+        val commandExecutor = PetCommandExecutor(this, bagGui, mainMenuGui)
+        getCommand("vocchipet")?.setExecutor(commandExecutor)
+        getCommand("vocchipet")?.tabCompleter = commandExecutor
+
+        // 註冊事件監聽器
+        server.pluginManager.registerEvents(GuiListener(this, bagGui, mainMenuGui), this)
 
         logger.info("VocchiPet 已啟動！")
     }
 
     override fun onDisable() {
         logger.info("VocchiPet 已關閉。")
-        logger.info("VocchiPet has been disabled.")
     }
 
     /**
@@ -87,4 +112,20 @@ class VocchiPet : JavaPlugin() {
      * @return 模型引擎實例 / The model engine instance.
      */
     fun getModelEngine(): ModelEngine = modelEngine
+
+    /**
+     * 獲取寵物種類註冊表。
+     * Gets the pet species registry.
+     *
+     * @return 種類註冊表實例 / The species registry instance.
+     */
+    fun getSpeciesRegistry(): PetSpeciesRegistry = speciesRegistry
+
+    /**
+     * 獲取寵物管理器。
+     * Gets the pet manager.
+     *
+     * @return 寵物管理器實例 / The pet manager instance.
+     */
+    fun getPetManager(): PetManager = petManager
 }
