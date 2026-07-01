@@ -42,8 +42,14 @@ class PetCommandExecutor(
         when (args[0].lowercase()) {
             "admin" -> handleAdminCommand(player, args)
             "bag" -> bagGui.openBag(player, 1)
-            "summon" -> player.sendMessage("§e功能開發中：召喚寵物")
-            "recall" -> player.sendMessage("§e功能開發中：收回寵物")
+            "summon" -> {
+                player.sendMessage("§e請從背包中選擇寵物進行召喚。")
+                bagGui.openBag(player, 1)
+            }
+            "recall" -> {
+                plugin.getPetManager().removeSummonedPet(player.uniqueId)
+                player.sendMessage("§a已收回寵物。")
+            }
             "home" -> mainMenuGui.open(player)
             else -> player.sendMessage("§c未知指令。使用 /vp 查看幫助。")
         }

@@ -42,7 +42,7 @@ class VocchiPet : JavaPlugin() {
         }
 
         // 初始化管理器
-        petManager = PetManager()
+        petManager = PetManager(this)
         capsuleManager = CapsuleManager(this)
         capsuleManager.registerRecipes()
 

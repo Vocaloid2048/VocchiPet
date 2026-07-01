@@ -8,9 +8,9 @@ import java.util.UUID
  * 管理玩家與其召喚寵物關係的類別。
  * Class for managing the relationship between players and their summoned pets.
  */
-class PetManager {
+class PetManager(private val plugin: com.voc2048.vocchipet.VocchiPet) {
     // 玩家 UUID -> 召喚中的寵物實例
-    private val summonedPets = mutableMapOf<UUID, Pet>()
+    private val summonedPets = mutableMapOf<UUID, com.voc2048.vocchipet.api.Pet>()
     
     // 玩家 UUID -> 召喚出的實體
     private val summonedEntities = mutableMapOf<UUID, Mob>()
@@ -55,14 +55,23 @@ class PetManager {
     fun getSummonedEntity(playerID: UUID): Mob? = summonedEntities[playerID]
 
     /**
-     * 移除玩家當前召喚的寵物與實體。
-     * Removes the pet and entity currently summoned by the player.
+     * 移除玩家當前召喚的寵物與實體，並保存當前狀態。
+     * Removes the pet and entity currently summoned by the player and saves the current state.
      *
      * @param playerID 玩家 UUID / Player UUID.
      */
     fun removeSummonedPet(playerID: UUID) {
-        summonedPets.remove(playerID)
-        summonedEntities.remove(playerID)?.remove()
+        val pet = summonedPets.remove(playerID)
+        val entity = summonedEntities.remove(playerID)
+        
+        if (pet != null && entity != null) {
+            // 保存當前血量
+            pet.setCurrentHp(entity.health)
+            // 觸發非同步保存
+            plugin.getPetStorage().savePet(pet)
+        }
+        
+        entity?.remove()
         aiTasks.remove(playerID)?.let { org.bukkit.Bukkit.getScheduler().cancelTask(it) }
     }
 }

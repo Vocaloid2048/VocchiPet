@@ -43,12 +43,17 @@ class MainMenuGui(private val plugin: VocchiPet) {
                 "WITHER_SKELETON" -> Material.WITHER_SKELETON_SPAWN_EGG
                 else -> Material.WOLF_SPAWN_EGG
             }
+            val summonedEntity = plugin.getPetManager().getSummonedEntity(player.uniqueId)
+            val maxHp = com.voc2048.vocchipet.core.util.PetStatCalculator.calculateMaxHp(summonedPet)
+            val currentHp = summonedEntity?.health ?: 0.0
+
             statusItem = ItemStack(material)
             val meta = statusItem.itemMeta
             meta?.setDisplayName("§b當前召喚：${summonedPet.getName()}")
             meta?.lore = listOf(
                 "§7種類: §f${species?.displayName ?: summonedPet.getType()}",
                 "§7等級: §f${summonedPet.getLevel()}",
+                "§7生命: §e${"%.1f".format(currentHp)} / ${"%.1f".format(maxHp)}",
                 "§7好感度: §d${"%.1f".format(summonedPet.getAffection())}"
             )
             statusItem.itemMeta = meta
@@ -60,6 +65,14 @@ class MainMenuGui(private val plugin: VocchiPet) {
             renameMeta?.lore = listOf("§7點擊為你的當前寵物設定一個新名字。", "§7Click to set a new name for your pet.")
             renameItem.itemMeta = renameMeta
             inv.setItem(22, renameItem)
+
+            // 收回按鈕 (Recall Button)
+            val recallItem = ItemStack(Material.REDSTONE_BLOCK)
+            val recallMeta = recallItem.itemMeta
+            recallMeta?.setDisplayName("§c收回寵物")
+            recallMeta?.lore = listOf("§7點擊收回當前召喚的寵物。", "§7Click to recall your summoned pet.")
+            recallItem.itemMeta = recallMeta
+            inv.setItem(24, recallItem)
         } else {
             statusItem = ItemStack(Material.BARRIER)
             val meta = statusItem.itemMeta
