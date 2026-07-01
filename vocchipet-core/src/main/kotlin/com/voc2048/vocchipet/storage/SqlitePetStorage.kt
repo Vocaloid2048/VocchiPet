@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.storage
+package com.voc2048.vocchipet.storage
 
 import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Pet
@@ -7,7 +7,7 @@ import com.voc2048.vocchipet.api.StatComponent
 import com.voc2048.vocchipet.api.Tier
 import com.voc2048.vocchipet.api.storage.ModelStorage
 import com.voc2048.vocchipet.api.storage.PetStorage
-import com.voc2048.vocchiPet.PetImpl
+import com.voc2048.vocchipet.PetImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.io.File

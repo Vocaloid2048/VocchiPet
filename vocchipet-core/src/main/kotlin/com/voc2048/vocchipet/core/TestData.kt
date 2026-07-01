@@ -1,10 +1,9 @@
-package com.voc2048.vocchiPet.core
+package com.voc2048.vocchipet.core
 
 import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.PetStats
 import com.voc2048.vocchipet.api.StatComponent
 import com.voc2048.vocchipet.api.Tier
-import java.util.UUID
 
 /**
  * 測試寵物數據定義。

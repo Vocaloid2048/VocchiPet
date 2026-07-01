@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.render
+package com.voc2048.vocchipet.render
 
 import com.voc2048.vocchipet.api.render.ModelEngine
 import com.voc2048.vocchipet.api.render.ModelRegistry

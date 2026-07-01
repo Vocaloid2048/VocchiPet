@@ -1,9 +1,7 @@
-package com.voc2048.vocchiPet.ai
+package com.voc2048.vocchipet.ai
 
-import org.bukkit.Location
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
-import com.destroystokyo.paper.entity.Pathfinder
 
 /**
  * 寵物跟隨主人的 AI 目標。

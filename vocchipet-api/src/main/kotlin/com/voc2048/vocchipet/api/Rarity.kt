@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.api
+package com.voc2048.vocchipet.api
 
 /**
  * 寵物的稀有度等級。

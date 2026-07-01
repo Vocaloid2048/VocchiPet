@@ -22,7 +22,7 @@
 在生成寵物前，需先將模型映射至註冊表。
 
 ```kotlin
-import com.voc2048.vocchiPet.render.DefaultModelRegistry
+import com.voc2048.vocchipet.render.DefaultModelRegistry
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -49,7 +49,7 @@ registry.registerModel("Fire Bird", item)
 
 ### 獲取渲染引擎實作
 ```kotlin
-import com.voc2048.vocchiPet.render.PetSpawnManager
+import com.voc2048.vocchipet.render.PetSpawnManager
 import com.voc2048.vocchipet.api.render.ModelEngine
 
 // 傳入註冊表以初始化引擎
@@ -75,7 +75,7 @@ modelEngine.updateRotation(display, player.location.yaw, player.location.pitch)
   - `com.voc2048.vocchipet.api.render.ModelEngine`
   - `com.voc2048.vocchipet.api.render.ModelRegistry`
 - **核心實作**：
-  - `com.voc2048.vocchiPet.render.PetSpawnManager`
-  - `com.voc2048.vocchiPet.render.DefaultModelRegistry`
+  - `com.voc2048.vocchipet.render.PetSpawnManager`
+  - `com.voc2048.vocchipet.render.DefaultModelRegistry`
 - **持久化儲存**：模型映射關係可透過 `ModelStorage` 介面儲存於 SQLite 資料庫中。
 - **技術選型**：使用 `org.bukkit.entity.ItemDisplay` 以獲得最佳的 3D 模型展示效果與性能表現。

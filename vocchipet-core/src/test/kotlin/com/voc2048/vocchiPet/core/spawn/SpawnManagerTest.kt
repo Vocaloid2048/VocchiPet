@@ -1,7 +1,6 @@
-package com.voc2048.vocchiPet.core.spawn
+package com.voc2048.vocchipet.core.spawn
 
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.RepeatedTest
 
 class SpawnManagerTest {

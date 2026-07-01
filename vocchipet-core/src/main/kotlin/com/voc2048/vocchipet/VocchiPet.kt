@@ -1,12 +1,12 @@
-package com.voc2048.vocchiPet
+package com.voc2048.vocchipet
 
 import com.voc2048.vocchipet.api.render.ModelEngine
 import com.voc2048.vocchipet.api.render.ModelRegistry
 import com.voc2048.vocchipet.api.storage.ModelStorage
 import com.voc2048.vocchipet.api.storage.PetStorage
-import com.voc2048.vocchiPet.render.DefaultModelRegistry
-import com.voc2048.vocchiPet.render.PetSpawnManager
-import com.voc2048.vocchiPet.storage.SqlitePetStorage
+import com.voc2048.vocchipet.render.DefaultModelRegistry
+import com.voc2048.vocchipet.render.PetSpawnManager
+import com.voc2048.vocchipet.storage.SqlitePetStorage
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Executor

@@ -1,6 +1,6 @@
-package com.voc2048.vocchiPet.interaction
+package com.voc2048.vocchipet.interaction
 
-import com.voc2048.vocchiPet.VocchiPet
+import com.voc2048.vocchipet.VocchiPet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

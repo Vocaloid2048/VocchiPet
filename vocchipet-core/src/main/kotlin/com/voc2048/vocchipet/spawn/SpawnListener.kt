@@ -1,6 +1,6 @@
-package com.voc2048.vocchiPet.spawn
+package com.voc2048.vocchipet.spawn
 
-import com.voc2048.vocchiPet.VocchiPet
+import com.voc2048.vocchipet.VocchiPet
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent

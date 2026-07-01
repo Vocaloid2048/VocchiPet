@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.spawn
+package com.voc2048.vocchipet.spawn
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

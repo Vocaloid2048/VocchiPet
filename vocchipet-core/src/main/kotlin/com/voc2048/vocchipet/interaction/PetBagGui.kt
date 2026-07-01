@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.interaction
+package com.voc2048.vocchipet.interaction
 
 import org.bukkit.Bukkit
 import org.bukkit.Material

@@ -7,7 +7,7 @@ plugins {
     id("xyz.jpenilla.run-paper")
 }
 
-val buildTime = SimpleDateFormat("yyyyMMdd-HHmm").format(Date())
+val buildTime = SimpleDateFormat("yyyyMMdd-HHmmss").format(Date())
 
 dependencies {
     implementation(project(":vocchipet-api"))
@@ -19,6 +19,7 @@ dependencies {
 
 tasks {
     shadowJar {
+        relocate("com.voc2048.vocchiPet", "com.voc2048.vocchipet")
         archiveFileName.set("VocchiPet-${project.version}-$buildTime.jar")
     }
 

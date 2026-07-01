@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.ai
+package com.voc2048.vocchipet.ai
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

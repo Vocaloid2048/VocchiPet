@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet
+package com.voc2048.vocchipet
 
 import com.voc2048.vocchipet.api.*
 import java.util.UUID

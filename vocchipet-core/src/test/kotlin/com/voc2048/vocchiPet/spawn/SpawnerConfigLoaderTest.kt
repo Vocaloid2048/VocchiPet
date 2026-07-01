@@ -1,4 +1,4 @@
-package com.voc2048.vocchiPet.spawn
+package com.voc2048.vocchipet.spawn
 
 import com.voc2048.vocchipet.api.Rarity
 import org.junit.jupiter.api.Assertions.*

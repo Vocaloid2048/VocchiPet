@@ -1,6 +1,5 @@
-package com.voc2048.vocchiPet.core.spawn
+package com.voc2048.vocchipet.core.spawn
 
-import com.voc2048.vocchiPet.api.Rarity
 import kotlin.random.Random
 
 /**
