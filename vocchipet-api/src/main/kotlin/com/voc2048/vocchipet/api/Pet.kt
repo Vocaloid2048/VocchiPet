@@ -7,6 +7,11 @@ import java.util.UUID
  * Represents a pet instance in the game.
  */
 interface Pet {
+    /**
+     * 獲取寵物的屬性數值。
+     * Gets the stats of the pet.
+     */
+    fun getStats(): PetStats
 
     /**
      * 獲取寵物的唯一識別碼。
