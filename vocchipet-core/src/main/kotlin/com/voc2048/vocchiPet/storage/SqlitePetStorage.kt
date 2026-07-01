@@ -2,6 +2,9 @@ package com.voc2048.vocchiPet.storage
 
 import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Pet
+import com.voc2048.vocchipet.api.PetStats
+import com.voc2048.vocchipet.api.StatComponent
+import com.voc2048.vocchipet.api.Tier
 import com.voc2048.vocchipet.api.storage.ModelStorage
 import com.voc2048.vocchipet.api.storage.PetStorage
 import com.voc2048.vocchiPet.PetImpl
@@ -222,6 +225,16 @@ class SqlitePetStorage(
      * @return 寵物實例 / The pet instance.
      */
     private fun mapResultSetToPet(rs: ResultSet): Pet {
+        // TODO: 解析 JSON 數據 / Parse JSON data
+        val stats = PetStats(
+            hp = StatComponent(0, Tier.D, 0),
+            attack = StatComponent(0, Tier.D, 0),
+            defense = StatComponent(0, Tier.D, 0),
+            speed = StatComponent(0, Tier.D, 0),
+            focus = StatComponent(0, Tier.D, 0),
+            availableTp = 0,
+            skills = arrayOfNulls<String>(6)
+        )
         return PetImpl(
             uuid = UUID.fromString(rs.getString("pet_uuid")),
             ownerId = UUID.fromString(rs.getString("owner_uuid")),
@@ -230,7 +243,8 @@ class SqlitePetStorage(
             level = rs.getInt("level"),
             exp = rs.getInt("exp"),
             affection = rs.getDouble("affection"),
-            element = Element.valueOf(rs.getString("element"))
+            element = Element.valueOf(rs.getString("element")),
+            stats = stats
         )
     }
 }
