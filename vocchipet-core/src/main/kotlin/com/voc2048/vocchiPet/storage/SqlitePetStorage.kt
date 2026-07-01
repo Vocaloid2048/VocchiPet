@@ -59,7 +59,19 @@ class SqlitePetStorage(
                         level INTEGER NOT NULL,
                         exp INTEGER NOT NULL,
                         affection REAL NOT NULL,
-                        element TEXT NOT NULL
+                        element TEXT NOT NULL,
+                        stats_json TEXT NOT NULL
+                    );
+                    CREATE TABLE IF NOT EXISTS vocchipet_players (
+                        player_uuid TEXT PRIMARY KEY,
+                        max_bag_pages INTEGER NOT NULL DEFAULT 1
+                    );
+                    CREATE TABLE IF NOT EXISTS vocchipet_bag (
+                        player_uuid TEXT NOT NULL,
+                        page INTEGER NOT NULL,
+                        slot INTEGER NOT NULL,
+                        pet_uuid TEXT,
+                        PRIMARY KEY (player_uuid, page, slot)
                     );
                     CREATE TABLE IF NOT EXISTS vocchipet_models (
                         model_key TEXT PRIMARY KEY,
@@ -94,8 +106,8 @@ class SqlitePetStorage(
             getConnection().use { conn ->
                 val sql = """
                     INSERT OR REPLACE INTO vocchipet_data 
-                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, level, exp, affection, element) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, level, exp, affection, element, stats_json) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """.trimIndent()
                 val pstmt: PreparedStatement = conn.prepareStatement(sql)
                 pstmt.setString(1, pet.getUniqueId().toString())
@@ -106,6 +118,8 @@ class SqlitePetStorage(
                 pstmt.setInt(6, pet.getExp())
                 pstmt.setDouble(7, pet.getAffection())
                 pstmt.setString(8, pet.getElement().name)
+                // TODO: 序列化 stats 為 JSON
+                pstmt.setString(9, "{}")
                 pstmt.executeUpdate()
             }
         }, executor)
