@@ -1,7 +1,12 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     kotlin("jvm")
     id("com.gradleup.shadow")
 }
+
+val buildTime = SimpleDateFormat("yyyyMMdd-HHmm").format(Date())
 
 dependencies {
     implementation(project(":vocchipet-api"))
@@ -10,7 +15,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveClassifier.set("")
+        archiveFileName.set("VocchiPet-${project.version}-$buildTime.jar")
     }
 
     processResources {

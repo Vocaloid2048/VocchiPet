@@ -4,6 +4,10 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
+kotlin {
+    jvmToolchain(25)
+}
+
 allprojects {
     group = "com.voc2048"
     version = "1.0.0-SNAPSHOT"
