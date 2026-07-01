@@ -7,6 +7,7 @@ import com.voc2048.vocchipet.api.storage.PetStorage
 import com.voc2048.vocchipet.render.DefaultModelRegistry
 import com.voc2048.vocchipet.render.PetSpawnManager
 import com.voc2048.vocchipet.storage.SqlitePetStorage
+import com.voc2048.vocchipet.interaction.PetCommandExecutor
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Executor
@@ -52,6 +53,8 @@ class VocchiPet : JavaPlugin() {
             logger.severe("初始化過程中發生錯誤: ${ex.message}")
             null
         }
+
+        getCommand("vocchipet")?.setExecutor(PetCommandExecutor(this))
 
         logger.info("VocchiPet 已啟動！")
     }

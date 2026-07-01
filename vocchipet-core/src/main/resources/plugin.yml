@@ -4,3 +4,9 @@ version: '${version}'
 main: com.voc2048.vocchipet.VocchiPet
 api-version: '26.1.2'
 load: POSTWORLD
+
+commands:
+  vocchipet:
+    description: "VocchiPet 主指令 / Main command for VocchiPet"
+    aliases: [vp]
+    permission: vocchipet.use
