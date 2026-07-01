@@ -39,9 +39,10 @@
 * 在兩位玩家中點自動劃定 15 格半徑的虛擬「決鬥結界」，限制外在干擾。
 * **零損失保護機制：** 戰敗寵物強制保留 1 HP 並安全收回，絕不真正死亡。
 
-### 📦 開源生態與自定義 (Customization)
-* 隨包附贈 **50 隻高畫質原創寵物 3D 模型**（基於 Display Entity 渲染與 CustomModelData 映射）。
-* 開放式 YML 結構，伺服器主可自由聲明、添加外部自製的 Blockbench 模型與自創技能。
+### 📦 模型渲染與自定義 (Model Engine)
+* **Display Entity 技術：** 採用 `ItemDisplay` 渲染，比起傳統盔甲架 (ArmorStand) 更節省效能且支援更複雜的旋轉平滑度。
+* **自定義模型映射：** 透過 `CustomModelData` 自由映射 Blockbench 匯出的 3D 模型。
+* **靈活控制：** 支援無視重力、無視碰撞，並可動態調整 Yaw/Pitch 以面向玩家。
 
 ---
 
@@ -49,8 +50,8 @@
 
 本專案採用嚴格的模組化與多模組（Multi-module）設計：
 
-* `aetheria-api/` - 開放式 API 介面、事件觸發（Events Registry），供第三方插件對接。
-* `aetheria-core/` - 插件底層驅動、NMS、Pathfinder AI、資料庫實作（SQLite / MySQL）。
+* `vocchipet-api/` - 開放式 API 介面、事件觸發（Events Registry），供第三方插件對接。
+* `vocchipet-core/` - 插件底層驅動、NMS、Pathfinder AI、資料庫實作（SQLite / MySQL）。
 * `wiki/` - 完整的系統設定與開發者對接文件。
 * `docs/agent/` - 用於約束與指導 AI Agent (如 Cursor / Claude) 進行協同開發的 SOP 規範。
 
