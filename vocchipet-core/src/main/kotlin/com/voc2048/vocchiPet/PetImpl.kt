@@ -1,7 +1,6 @@
 package com.voc2048.vocchiPet
 
-import com.voc2048.vocchipet.api.Element
-import com.voc2048.vocchipet.api.Pet
+import com.voc2048.vocchipet.api.*
 import java.util.UUID
 
 /**
@@ -16,6 +15,7 @@ import java.util.UUID
  * @property exp 寵物經驗值 / The experience points of the pet.
  * @property affection 寵物好感度 / The affection level of the pet.
  * @property element 寵物元素屬性 / The elemental attribute of the pet.
+ * @property stats 寵物屬性結構 / The stats structure of the pet.
  */
 data class PetImpl(
     private val uuid: UUID,
@@ -25,7 +25,8 @@ data class PetImpl(
     private var level: Int,
     private var exp: Int,
     private var affection: Double,
-    private val element: Element
+    private val element: Element,
+    private val stats: PetStats
 ) : Pet {
 
     override fun getUniqueId(): UUID = uuid
@@ -51,4 +52,6 @@ data class PetImpl(
     }
 
     override fun getElement(): Element = element
+
+    override fun getStats(): PetStats = stats
 }
