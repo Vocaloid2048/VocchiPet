@@ -116,4 +116,20 @@ interface Pet {
      * @param subspecies 是否為亞種 / Whether it is a subspecies.
      */
     fun setSubspecies(subspecies: Boolean)
+
+    /**
+     * 獲取寵物當前生命值。
+     * Gets the current HP of the pet.
+     *
+     * @return 當前生命值 / The current HP.
+     */
+    fun getCurrentHp(): Double
+
+    /**
+     * 設定寵物當前生命值。
+     * Sets the current HP of the pet.
+     *
+     * @param hp 新的生命值 / The new HP.
+     */
+    fun setCurrentHp(hp: Double)
 }

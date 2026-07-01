@@ -47,6 +47,7 @@ class SqlitePetStorage(
                         exp INTEGER NOT NULL,
                         affection REAL NOT NULL,
                         subspecies INTEGER NOT NULL DEFAULT 0,
+                        current_hp REAL NOT NULL DEFAULT -1.0,
                         stats_json TEXT NOT NULL
                     );
                     CREATE TABLE IF NOT EXISTS vocchipet_players (
@@ -67,6 +68,9 @@ class SqlitePetStorage(
                 try {
                     conn.createStatement().execute("ALTER TABLE vocchipet_data ADD COLUMN pet_name TEXT DEFAULT ''")
                 } catch (e: Exception) {}
+                try {
+                    conn.createStatement().execute("ALTER TABLE vocchipet_data ADD COLUMN current_hp REAL DEFAULT -1.0")
+                } catch (e: Exception) {}
             }
         }, executor)
     }
@@ -76,8 +80,8 @@ class SqlitePetStorage(
             getConnection().use { conn ->
                 val sql = """
                     INSERT OR REPLACE INTO vocchipet_data 
-                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, pet_name, level, exp, affection, subspecies, stats_json) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, pet_name, level, exp, affection, subspecies, current_hp, stats_json) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """.trimIndent()
                 val pstmt: PreparedStatement = conn.prepareStatement(sql)
                 pstmt.setString(1, pet.getUniqueId().toString())
@@ -89,7 +93,8 @@ class SqlitePetStorage(
                 pstmt.setInt(7, pet.getExp())
                 pstmt.setDouble(8, pet.getAffection())
                 pstmt.setInt(9, if (pet.isSubspecies()) 1 else 0)
-                pstmt.setString(10, gson.toJson(pet.getStats()))
+                pstmt.setDouble(10, pet.getCurrentHp())
+                pstmt.setString(11, gson.toJson(pet.getStats()))
                 pstmt.executeUpdate()
             }
         }, executor)
@@ -151,7 +156,8 @@ class SqlitePetStorage(
             exp = rs.getInt("exp"),
             affection = rs.getDouble("affection"),
             stats = stats,
-            subspecies = rs.getInt("subspecies") == 1
+            subspecies = rs.getInt("subspecies") == 1,
+            currentHp = rs.getDouble("current_hp")
         )
     }
 }

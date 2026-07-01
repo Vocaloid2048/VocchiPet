@@ -17,7 +17,8 @@ data class PetImpl(
     private var exp: Int,
     private var affection: Double,
     private var stats: PetStats,
-    private var subspecies: Boolean = false
+    private var subspecies: Boolean = false,
+    private var currentHp: Double = -1.0
 ) : Pet {
 
     companion object {
@@ -50,7 +51,8 @@ data class PetImpl(
                 exp = 0,
                 affection = 20.0,
                 stats = stats,
-                subspecies = false
+                subspecies = false,
+                currentHp = -1.0 // -1 表示滿血
             )
         }
     }
@@ -97,5 +99,11 @@ data class PetImpl(
 
     override fun setSubspecies(subspecies: Boolean) {
         this.subspecies = subspecies
+    }
+
+    override fun getCurrentHp(): Double = currentHp
+
+    override fun setCurrentHp(hp: Double) {
+        this.currentHp = hp
     }
 }
