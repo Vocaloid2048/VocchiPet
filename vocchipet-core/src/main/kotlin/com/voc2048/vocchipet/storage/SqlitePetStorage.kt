@@ -63,6 +63,7 @@ class SqlitePetStorage(
                         exp INTEGER NOT NULL,
                         affection REAL NOT NULL,
                         element TEXT NOT NULL,
+                        streaming INTEGER NOT NULL DEFAULT 0,
                         stats_json TEXT NOT NULL
                     );
                     CREATE TABLE IF NOT EXISTS vocchipet_players (
@@ -84,15 +85,16 @@ class SqlitePetStorage(
                 """.trimIndent()
                 conn.createStatement().execute(sql)
                 
-                // 檢查並為舊資料表添加 tamer_uuid 欄位 (Migration)
-                // Check and add tamer_uuid column for existing table (Migration)
+                // 檢查並為舊資料表添加欄位 (Migration)
+                // Check and add columns for existing table (Migration)
                 try {
                     conn.createStatement().execute("ALTER TABLE vocchipet_data ADD COLUMN tamer_uuid TEXT DEFAULT ''")
-                    // 將預設值設為 owner_uuid (若原本已有數據)
                     conn.createStatement().execute("UPDATE vocchipet_data SET tamer_uuid = owner_uuid WHERE tamer_uuid = ''")
-                } catch (e: Exception) {
-                    // 欄位可能已存在，忽略異常 / Column might already exist, ignore exception
-                }
+                } catch (e: Exception) {}
+                
+                try {
+                    conn.createStatement().execute("ALTER TABLE vocchipet_data ADD COLUMN streaming INTEGER DEFAULT 0")
+                } catch (e: Exception) {}
             }
         }, executor)
     }
@@ -109,8 +111,8 @@ class SqlitePetStorage(
             getConnection().use { conn ->
                 val sql = """
                     INSERT OR REPLACE INTO vocchipet_data 
-                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, level, exp, affection, element, stats_json) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, level, exp, affection, element, streaming, stats_json) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """.trimIndent()
                 val pstmt: PreparedStatement = conn.prepareStatement(sql)
                 pstmt.setString(1, pet.getUniqueId().toString())
@@ -121,8 +123,9 @@ class SqlitePetStorage(
                 pstmt.setInt(6, pet.getExp())
                 pstmt.setDouble(7, pet.getAffection())
                 pstmt.setString(8, pet.getElement().name)
+                pstmt.setInt(9, if (pet.isStreaming()) 1 else 0)
                 // TODO: 序列化 stats 為 JSON
-                pstmt.setString(9, "{}")
+                pstmt.setString(10, "{}")
                 pstmt.executeUpdate()
             }
         }, executor)
@@ -244,7 +247,8 @@ class SqlitePetStorage(
             exp = rs.getInt("exp"),
             affection = rs.getDouble("affection"),
             element = Element.valueOf(rs.getString("element")),
-            stats = stats
+            stats = stats,
+            streaming = rs.getInt("streaming") == 1
         )
     }
 }

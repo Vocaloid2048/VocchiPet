@@ -92,4 +92,20 @@ interface Pet {
      * @return 寵物的屬性類型 / The attribute type of the pet.
      */
     fun getElement(): Element
+
+    /**
+     * 獲取寵物是否為流光（閃光）亞種。
+     * Gets whether the pet is a streaming (shiny) subspecies.
+     *
+     * @return 若為流光則返回 true / True if it is streaming.
+     */
+    fun isStreaming(): Boolean
+
+    /**
+     * 設定寵物的流光狀態。
+     * Sets the streaming status of the pet.
+     *
+     * @param streaming 是否為流光 / Whether it is streaming.
+     */
+    fun setStreaming(streaming: Boolean)
 }

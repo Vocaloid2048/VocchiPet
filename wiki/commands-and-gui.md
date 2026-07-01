@@ -23,24 +23,38 @@ The main command is `/vocchipet`, with the alias `/vp`.
 
 | 指令 (Command) | 描述 (Description) | 權限 (Permission) |
 | --- | --- | --- |
-| `/vp admin give <玩家> <種類ID> <資質>` | 賦予指定玩家特定種類與資質的寵物 / Gives a pet to a player. | `vocchipet.admin` |
+| `/vp admin give <玩家> <種類ID> [參數]` | 賦予指定玩家寵物。若無參數則開啟 GUI / Gives a pet. Opens GUI if no params. | `vocchipet.admin` |
 | `/vp admin addpage <玩家>` | 提升指定玩家的寵物背包上限頁數 / Increases pet bag page limit. | `vocchipet.admin` |
 | `/vp admin reload` | 重新讀取插件配置與數據映射 / Reloads plugin configuration. | `vocchipet.admin` |
 
-* **資質選項 (Quality Options):** `D`, `C`, `B`, `A`, `S`, `SS`, `SS_PLUS`, `UR`
+#### 💡 高級給予語法 (Advanced Give Syntax)
+
+管理員可以在指令後方帶入 JSON 格式或鍵值對格式的參數：
+Admins can use JSON or Key-Value pairs for parameters:
+
+* **JSON 格式:** `/vp admin give Player1 dragon {"level":50,"shinny":true,"tier":"UR","element":"FIRE"}`
+* **鍵值對格式:** `/vp admin give Player1 dragon level=50 shinny=true tier=UR element=FIRE`
+
+* **參數支援:** `level`, `tier` (D~UR), `element` (FIRE, WATER, GRASS, LIGHT, DARK), `shinny` (true/false)
 
 ---
 
 ## 🖥️ GUI 介面說明 (GUI Descriptions)
 
 ### 🏠 主選單 (Main Menu)
-* **功能：** 作為所有功能的入口。
-* **內容：**
-  * **寵物背包：** 點擊跳轉至背包介面。
-  * **寵物狀態：** 顯示當前召喚寵物的快速預覽。
-  * **說明指南：** 查看基本玩法說明。
+... (略)
 
 ### 🎒 寵物背包 (Pet Bag)
+... (略)
+
+### 🛠️ 寵物構造大師 (Pet Construction Master)
+* **開啟方式：** 管理員執行 `/vp admin give <玩家> <寵物ID>` 且不帶參數。
+* **功能：**
+  * **等級調整：** 透過按鈕快速增減等級 (+1/-1/+10/-10)。
+  * **流光切換：** 一鍵切換寵物是否為「流光 (Streaming/Shiny)」亞種。
+  * **元素切換：** 循環切換寵物的五大元素屬性。
+  * **資質切換：** 循環切換資質階級 (D ~ UR)。
+  * **確認生成：** 完成設定後點擊，寵物將直接發放至目標玩家的 `/petbag` 中。
 * **佈局：** 45 格寵物存放區 + 9 格導航控制欄。
 * **分頁邏輯：**
   * 支援多頁顯示，透過底部「上一頁/下一頁」箭頭切換。

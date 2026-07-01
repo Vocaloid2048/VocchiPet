@@ -25,8 +25,9 @@ data class PetImpl(
     private var level: Int,
     private var exp: Int,
     private var affection: Double,
-    private val element: Element,
-    private val stats: PetStats
+    private var element: Element,
+    private val stats: PetStats,
+    private var streaming: Boolean = false
 ) : Pet {
 
     companion object {
@@ -59,7 +60,8 @@ data class PetImpl(
                 exp = 0,
                 affection = 20.0, // 初始好感度：普通
                 element = species.element,
-                stats = stats
+                stats = stats,
+                streaming = false
             )
         }
     }
@@ -78,7 +80,15 @@ data class PetImpl(
 
     override fun getLevel(): Int = level
 
+    fun setLevel(level: Int) {
+        this.level = level
+    }
+
     override fun getExp(): Int = exp
+
+    fun setExp(exp: Int) {
+        this.exp = exp
+    }
 
     override fun getAffection(): Double = affection
 
@@ -88,5 +98,15 @@ data class PetImpl(
 
     override fun getElement(): Element = element
 
+    fun setElement(element: Element) {
+        this.element = element
+    }
+
     override fun getStats(): PetStats = stats
+
+    override fun isStreaming(): Boolean = streaming
+
+    override fun setStreaming(streaming: Boolean) {
+        this.streaming = streaming
+    }
 }

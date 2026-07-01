@@ -31,6 +31,7 @@ class VocchiPet : JavaPlugin() {
     private lateinit var petManager: PetManager
     private lateinit var bagGui: PetBagGui
     private lateinit var mainMenuGui: MainMenuGui
+    private lateinit var constructionGui: PetConstructionMasterGui
 
     override fun onEnable() {
         // 初始化非同步執行器
@@ -50,6 +51,7 @@ class VocchiPet : JavaPlugin() {
         // 初始化 GUI
         bagGui = PetBagGui(this)
         mainMenuGui = MainMenuGui(this)
+        constructionGui = PetConstructionMasterGui(this)
 
         // 初始化儲存器與註冊表
         val dbFile = File(dataFolder, "storage.db")
@@ -75,12 +77,12 @@ class VocchiPet : JavaPlugin() {
         }
 
         // 註冊指令
-        val commandExecutor = PetCommandExecutor(this, bagGui, mainMenuGui)
+        val commandExecutor = PetCommandExecutor(this, bagGui, mainMenuGui, constructionGui)
         getCommand("vocchipet")?.setExecutor(commandExecutor)
         getCommand("vocchipet")?.tabCompleter = commandExecutor
 
         // 註冊事件監聽器
-        server.pluginManager.registerEvents(GuiListener(this, bagGui, mainMenuGui), this)
+        server.pluginManager.registerEvents(GuiListener(this, bagGui, mainMenuGui, constructionGui), this)
 
         logger.info("VocchiPet 已啟動！")
     }

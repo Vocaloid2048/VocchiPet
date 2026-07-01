@@ -1,9 +1,12 @@
 package com.voc2048.vocchipet.interaction
 
+import com.google.gson.Gson
 import com.voc2048.vocchipet.PetImpl
 import com.voc2048.vocchipet.VocchiPet
+import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Tier
 import org.bukkit.Bukkit
+import java.util.UUID
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -17,12 +20,16 @@ import org.bukkit.entity.Player
  * @property plugin 插件實例 / Plugin instance.
  * @property bagGui 寵物背包 GUI / Pet bag GUI.
  * @property mainMenuGui 主選單 GUI / Main menu GUI.
+ * @property constructionGui 寵物構造大師 GUI / Pet Construction Master GUI.
  */
 class PetCommandExecutor(
     private val plugin: VocchiPet,
     private val bagGui: PetBagGui,
-    private val mainMenuGui: MainMenuGui
+    private val mainMenuGui: MainMenuGui,
+    private val constructionGui: PetConstructionMasterGui
 ) : CommandExecutor, TabCompleter {
+
+    private val gson = Gson()
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) {
@@ -60,8 +67,8 @@ class PetCommandExecutor(
 
         when (args[1].lowercase()) {
             "give" -> {
-                if (args.size < 5) {
-                    player.sendMessage("§c用法: /vp admin give <玩家> <寵物ID> <資質(D~UR)>")
+                if (args.size < 4) {
+                    player.sendMessage("§c用法: /vp admin give <玩家> <寵物ID> [參數JSON]")
                     return
                 }
                 val target = Bukkit.getPlayer(args[2])
@@ -75,20 +82,26 @@ class PetCommandExecutor(
                     player.sendMessage("§c找不到寵物種類 ${speciesId}")
                     return
                 }
-                val quality = try {
-                    Tier.valueOf(args[4].uppercase())
-                } catch (e: Exception) {
-                    player.sendMessage("§c無效的資質: ${args[4]}。可選: D, C, B, A, S, SS, SS_PLUS, UR")
+
+                if (args.size == 4) {
+                    // 開啟 GUI
+                    constructionGui.open(player, target, species)
                     return
                 }
 
-                val newPet = PetImpl.create(species, target.uniqueId, quality)
-                plugin.getPetStorage().savePet(newPet).thenAccept {
-                    player.sendMessage("§a已成功賦予 ${target.name} 一隻 ${species.displayName} (§f資質: $quality)")
-                    target.sendMessage("§a管理員賦予了你一隻 ${species.displayName}！")
-                }.exceptionally { ex ->
-                    player.sendMessage("§c賦予失敗: ${ex.message}")
-                    null
+                // 解析參數
+                val paramStr = args.slice(4 until args.size).joinToString(" ")
+                try {
+                    val newPet = parseAndCreatePet(species, target.uniqueId, paramStr)
+                    plugin.getPetStorage().savePet(newPet).thenAccept {
+                        player.sendMessage("§a已成功賦予 ${target.name} 一隻 ${species.displayName} (自定義參數)")
+                        target.sendMessage("§a管理員賦予了你一隻 ${species.displayName}！")
+                    }.exceptionally { ex ->
+                        player.sendMessage("§c賦予失敗: ${ex.message}")
+                        null
+                    }
+                } catch (e: Exception) {
+                    player.sendMessage("§c參數解析失敗: ${e.message}")
                 }
             }
             "addpage" -> {
@@ -110,6 +123,45 @@ class PetCommandExecutor(
         }
     }
 
+    private fun parseAndCreatePet(species: com.voc2048.vocchipet.api.PetSpecies, ownerId: UUID, paramStr: String): PetImpl {
+        // 預設值
+        var level = 1
+        var tier = Tier.D
+        var element = species.element
+        var streaming = false
+
+        if (paramStr.startsWith("{") && paramStr.endsWith("}")) {
+            // JSON 格式
+            val map = gson.fromJson(paramStr, Map::class.java)
+            map["level"]?.let { level = (it as Double).toInt() }
+            map["tier"]?.let { tier = Tier.valueOf(it.toString().uppercase()) }
+            map["element"]?.let { element = Element.valueOf(it.toString().uppercase()) }
+            map["shinny"]?.let { streaming = it as Boolean }
+            map["shiny"]?.let { streaming = it as Boolean }
+        } else {
+            // 鍵值對格式: level=50 tier=UR element=FIRE shinny=true
+            val pairs = paramStr.split(" ")
+            for (pair in pairs) {
+                val kv = pair.split("=")
+                if (kv.size != 2) continue
+                val key = kv[0].lowercase()
+                val value = kv[1]
+                when (key) {
+                    "level" -> level = value.toInt()
+                    "tier" -> tier = Tier.valueOf(value.uppercase())
+                    "element" -> element = Element.valueOf(value.uppercase())
+                    "shinny", "shiny" -> streaming = value.toBoolean()
+                }
+            }
+        }
+
+        val pet = PetImpl.create(species, ownerId, tier)
+        pet.setLevel(level)
+        pet.setElement(element)
+        pet.setStreaming(streaming)
+        return pet
+    }
+
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         if (args.size == 1) {
             return listOf("admin", "bag", "summon", "recall", "home").filter { it.startsWith(args[0].lowercase()) }
@@ -124,7 +176,7 @@ class PetCommandExecutor(
             return plugin.getSpeciesRegistry().getAllSpecies().map { it.id }.filter { it.startsWith(args[3].lowercase()) }
         }
         if (args.size == 5 && args[0].equals("admin", true) && args[1].equals("give", true)) {
-            return Tier.entries.map { it.name }.filter { it.startsWith(args[4].uppercase()) }
+            return listOf("{\"level\":1,\"tier\":\"D\",\"shinny\":false}").filter { it.startsWith(args[4]) }
         }
         return emptyList()
     }
