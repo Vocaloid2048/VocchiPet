@@ -52,6 +52,14 @@ class MainMenuGui(private val plugin: VocchiPet) {
                 "§7好感度: §d${"%.1f".format(summonedPet.getAffection())}"
             )
             statusItem.itemMeta = meta
+            
+            // 改名按鈕 (Free Rename Button)
+            val renameItem = ItemStack(Material.NAME_TAG)
+            val renameMeta = renameItem.itemMeta
+            renameMeta?.setDisplayName("§a免費修改暱稱")
+            renameMeta?.lore = listOf("§7點擊為你的當前寵物設定一個新名字。", "§7Click to set a new name for your pet.")
+            renameItem.itemMeta = renameMeta
+            inv.setItem(22, renameItem)
         } else {
             statusItem = ItemStack(Material.BARRIER)
             val meta = statusItem.itemMeta
