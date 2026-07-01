@@ -1,11 +1,7 @@
 plugins {
     kotlin("jvm") version "2.4.0"
     id("com.gradleup.shadow") version "9.4.3" apply false
-    id("xyz.jpenilla.run-paper") version "3.0.2"
-}
-
-kotlin {
-    jvmToolchain(25)
+    id("xyz.jpenilla.run-paper") version "3.0.2" apply false
 }
 
 allprojects {
@@ -30,12 +26,9 @@ subprojects {
     }
 }
 
-tasks {
-    runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("26.1.2")
-        jvmArgs("-Xms2G", "-Xmx2G")
-    }
+// 橋接任務，讓根專案的 runServer 指向 vocchipet-core
+tasks.register("runServer") {
+    group = "run-paper"
+    description = "Run the Paper server (delegated to :vocchipet-core)"
+    dependsOn(":vocchipet-core:runServer")
 }
