@@ -14,7 +14,7 @@ You must strictly follow this Git branch and commit strategy. **Never work direc
 * **`<mc-version>` (e.g., 1.21.1):** 指定 Minecraft 版本 - 穩定插件版本。
 * **dev:** 最新支援的 Minecraft 版本 - 開發中插件版本。
 * **`<mc-version>-dev` (e.g., 1.21.1-dev):** 指定 Minecraft 版本 - 開發中插件版本。
-* **`feat-<core-module>`:** 功能開發分支 (e.g., `feat-storage-system`)。
+* **`feat-<core-module>`:** 功能開發分支 (e.g., `feat-storage-system`, `feat-pet-interaction`)。
 
 ### 🔄 Merge Workflow (PR Logic)
 
@@ -32,9 +32,10 @@ You must use **Conventional Commits** in **Traditional Chinese (繁體中文)**.
 
 * *Format:* `<type>(<scope>): <description>`
 * *Examples:*
-* `feat(db): 實作 SQLite 寵物數據儲存與讀取`
-* `fix(ai): 修復寵物在方塊邊緣導航卡死的問題`
-* `test(combat): 新增屬性相剋機制的 JUnit 測試案例`
+* `feat(storage): 實作 SQLite 寵物數據 1-16 級先天值與 4 技能槽 JSON 序列化儲存`
+* `feat(interaction): 實作 BreedingManager 攜帶指定道具固定遺傳 2 項先天值之演算法`
+* `fix(ai): 修復原生狼實體在採收作物時觸發 BlockBreakEvent 的路徑卡死問題`
+* `test(combat): 新增寵物膠囊投擲命中與目標血量百分比捕捉率的 JUnit 測試案例`
 
 
 
@@ -44,7 +45,7 @@ You must use **Conventional Commits** in **Traditional Chinese (繁體中文)**.
 
 ### 🏗️ Architecture: API & Implementation Separation
 
-* **Decoupling:** Define all core interactions, event triggers, and data structures in an `api` module/package.
+* **Decoupling:** Define all core interactions, event triggers, and data structures in an `api` module/package (`vocchipet-api`).
 * **Extensibility:** Ensure other developers can hook into your API for PlaceholderAPI, Vault, or MythicMobs integrations.
 * **Dependency Control:** You are permitted to modify `build.gradle.kts` to manage dependencies, but you **MUST NOT** access, modify, or leak any sensitive data (credentials, API keys, private server tokens).
 
@@ -54,8 +55,6 @@ You must use **Conventional Commits** in **Traditional Chinese (繁體中文)**.
 * **JavaDoc Requirement:** Every class, interface, and method **must** include a JavaDoc block.
 * *Content:* Clearly state the purpose, `@param`, and `@return`. **Do not** explain internal logic lines unless highly complex.
 * *Bilingual Requirement:* Comments must be provided in **Traditional Chinese + English translation**.
-
-
 
 ```kotlin
 /**
@@ -92,7 +91,7 @@ For **every** feature added or modified, you must instantly update or create the
 ### 🧪 Compilation & Testing
 
 * **Build Tool:** Gradle with Kotlin DSL (`build.gradle.kts`).
-* **Core Logic:** Any deterministic logic (e.g., combat damage scaling, attribute math, database queries) **MUST** be backed by **JUnit 5** test suites.
+* **Core Logic:** Any deterministic logic (e.g., breeding inheritance rules, attribute math formulas, capsule catch probability, database queries) **MUST** be backed by **JUnit 5** test suites.
 * **Deployment Automation:** If configured in the environment, compile the project and automatically copy the output `.jar` into the test server's `plugins/` directory, then initiate a live reload check.
 
 ### 🚨 Infinite Loop Guardrail (Deadlock Prevention)
