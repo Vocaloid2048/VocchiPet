@@ -94,6 +94,10 @@ class PetBagGui(private val plugin: VocchiPet) {
         val meta = item.itemMeta
         meta?.setDisplayName("§b${pet.getName()} §f(Lv.${pet.getLevel()})")
         
+        // 注入寵物 UUID 到 PersistentDataContainer
+        val petKey = org.bukkit.NamespacedKey(plugin, "pet_uuid")
+        meta?.persistentDataContainer?.set(petKey, org.bukkit.persistence.PersistentDataType.STRING, pet.getUniqueId().toString())
+
         val stats = pet.getStats()
         val lore = mutableListOf<String>()
         lore.add("§7種類: §f${species?.displayName ?: pet.getType()}")

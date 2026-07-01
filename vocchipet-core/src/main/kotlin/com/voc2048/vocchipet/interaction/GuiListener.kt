@@ -3,8 +3,10 @@ package com.voc2048.vocchipet.interaction
 import com.voc2048.vocchipet.VocchiPet
 import com.voc2048.vocchipet.api.Tier
 import com.voc2048.vocchipet.PetImpl
+import com.voc2048.vocchipet.ai.FollowOwnerGoal
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -22,6 +24,8 @@ class GuiListener(
     private val constructionGui: PetConstructionMasterGui
 ) : Listener {
 
+    private val renamingPlayers = mutableSetOf<UUID>()
+
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
         val player = event.whoClicked as? Player ?: return
@@ -32,6 +36,10 @@ class GuiListener(
             event.isCancelled = true
             when (currentItem.type) {
                 Material.CHEST -> bagGui.openBag(player, 1)
+                Material.NAME_TAG -> {
+                    player.closeInventory()
+                    startRenaming(player)
+                }
                 Material.BARRIER -> player.closeInventory()
                 else -> {}
             }
@@ -48,7 +56,12 @@ class GuiListener(
                 val currentPage = title.filter { it.isDigit() }.toIntOrNull() ?: 1
                 if (currentPage > 1) bagGui.openBag(player, currentPage - 1)
             } else if (currentItem.type != Material.BLACK_STAINED_GLASS_PANE && currentItem.type != Material.PAPER) {
-                player.sendMessage("§a你選擇了寵物：$displayName (召喚功能實作中)")
+                val petKey = org.bukkit.NamespacedKey(plugin, "pet_uuid")
+                val petIdStr = currentItem.itemMeta?.persistentDataContainer?.get(petKey, org.bukkit.persistence.PersistentDataType.STRING)
+                if (petIdStr != null) {
+                    val petUuid = UUID.fromString(petIdStr)
+                    handleSummon(player, petUuid)
+                }
                 player.closeInventory()
             }
             return
@@ -58,6 +71,66 @@ class GuiListener(
             event.isCancelled = true
             handleConstructionClick(player, event)
             return
+        }
+    }
+
+    private fun handleSummon(player: Player, petUuid: UUID) {
+        plugin.getPetStorage().loadPetsByOwner(player.uniqueId).thenAccept { pets ->
+            val pet = pets.find { it.getUniqueId() == petUuid } ?: return@thenAccept
+            
+            Bukkit.getScheduler().runTask(plugin, Runnable {
+                val species = plugin.getSpeciesRegistry().getSpecies(pet.getType()) ?: return@Runnable
+                
+                // 生成實體
+                val entity = player.world.spawnEntity(player.location, species.entityType) as? Mob ?: return@Runnable
+                
+                // 設定屬性
+                entity.customName = pet.getName()
+                entity.isCustomNameVisible = true
+                
+                // 注入 AI (簡單 tick 任務)
+                val followGoal = FollowOwnerGoal(entity, player)
+                val task = Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
+                    if (!entity.isValid || !player.isOnline) return@Runnable
+                    followGoal.tick()
+                }, 0L, 5L)
+                
+                // 管理器記錄
+                plugin.getPetManager().setSummonedPet(player.uniqueId, pet, entity, task.taskId)
+                
+                player.sendMessage("§a成功召喚寵物：${pet.getName()}！")
+            })
+        }
+    }
+
+    private fun startRenaming(player: Player) {
+        val summonedPet = plugin.getPetManager().getSummonedPet(player.uniqueId)
+        if (summonedPet == null) {
+            player.sendMessage("§c你目前沒有召喚任何寵物。")
+            return
+        }
+        
+        player.sendMessage("§e請在聊天欄輸入新的暱稱（輸入 'cancel' 取消）：")
+        renamingPlayers.add(player.uniqueId)
+    }
+
+    fun isRenaming(player: Player): Boolean = renamingPlayers.contains(player.uniqueId)
+
+    fun handleChatRename(player: Player, name: String) {
+        renamingPlayers.remove(player.uniqueId)
+        if (name.equals("cancel", true)) {
+            player.sendMessage("§c已取消改名。")
+            return
+        }
+
+        val pet = plugin.getPetManager().getSummonedPet(player.uniqueId) ?: return
+        val entity = plugin.getPetManager().getSummonedEntity(player.uniqueId)
+        
+        pet.setName(name)
+        entity?.customName = name
+        
+        plugin.getPetStorage().savePet(pet).thenAccept {
+            player.sendMessage("§a寵物暱稱已成功修改為：$name")
         }
     }
 
