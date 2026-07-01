@@ -46,5 +46,9 @@ data class PetImpl(
 
     override fun getAffection(): Double = affection
 
+    override fun setAffection(affection: Double) {
+        this.affection = affection
+    }
+
     override fun getElement(): Element = element
 }

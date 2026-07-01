@@ -73,6 +73,14 @@ interface Pet {
     fun getAffection(): Double
 
     /**
+     * 設定寵物的好感度。
+     * Sets the affection level of the pet.
+     *
+     * @param affection 新的好感度數值 / The new affection level value.
+     */
+    fun setAffection(affection: Double)
+
+    /**
      * 獲取寵物的元素屬性。
      * Gets the elemental attribute of the pet.
      *
