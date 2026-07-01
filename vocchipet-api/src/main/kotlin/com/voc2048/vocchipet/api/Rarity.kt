@@ -1,43 +1,20 @@
-package com.voc2048.vocchipet.api
+package com.voc2048.vocchiPet.api
 
 /**
- * 寵物的稀有度類別。
- * Rarity categories for pets.
+ * 寵物的稀有度等級。
+ * The rarity level of the pet.
  */
 enum class Rarity {
-    /**
-     * 普通：最常見的寵物。
-     * COMMON: The most common pets.
-     */
+    /** 一般 / Common */
     COMMON,
-
-    /**
-     * 罕見：稍具價值的寵物。
-     * UNCOMMON: Slightly more valuable pets.
-     */
+    /** 不尋常 / Uncommon */
     UNCOMMON,
-
-    /**
-     * 稀有：具有一定挑戰性或價值的寵物。
-     * RARE: Pets with certain challenge or value.
-     */
+    /** 稀有 / Rare */
     RARE,
-
-    /**
-     * 史詩：非常強大且難以遇見的寵物。
-     * EPIC: Very powerful and hard-to-encounter pets.
-     */
+    /** 史詩 / Epic */
     EPIC,
-
-    /**
-     * 傳奇：極其罕見，擁有強大能力的寵物。
-     * LEGENDARY: Extremely rare pets with powerful abilities.
-     */
+    /** 傳說 / Legendary */
     LEGENDARY,
-
-    /**
-     * 神秘：僅在特殊條件或傳說中出現的寵物。
-     * MYTHICAL: Pets that only appear in special conditions or legends.
-     */
+    /** 神話 / Mythical */
     MYTHICAL
 }
