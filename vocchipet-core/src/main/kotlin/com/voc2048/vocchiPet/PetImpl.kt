@@ -9,7 +9,8 @@ import java.util.UUID
  * Basic implementation of the Pet interface.
  *
  * @property uuid 寵物的唯一識別碼 / The unique identifier of the pet.
- * @property ownerId 主人的唯一識別碼 / The unique identifier of the owner.
+ * @property ownerId 當前主人的唯一識別碼 / The unique identifier of the current owner.
+ * @property tamerId 最初馴養者的唯一識別碼 / The unique identifier of the original tamer.
  * @property type 寵物類型 / The type of the pet.
  * @property level 寵物等級 / The level of the pet.
  * @property exp 寵物經驗值 / The experience points of the pet.
@@ -18,7 +19,8 @@ import java.util.UUID
  */
 data class PetImpl(
     private val uuid: UUID,
-    private val ownerId: UUID,
+    private var ownerId: UUID,
+    private val tamerId: UUID,
     private val type: String,
     private var level: Int,
     private var exp: Int,
@@ -29,6 +31,12 @@ data class PetImpl(
     override fun getUniqueId(): UUID = uuid
 
     override fun getOwnerId(): UUID = ownerId
+
+    override fun setOwnerId(ownerId: UUID) {
+        this.ownerId = ownerId
+    }
+
+    override fun getTamerId(): UUID = tamerId
 
     override fun getType(): String = type
 

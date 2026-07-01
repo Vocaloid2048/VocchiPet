@@ -10,7 +10,8 @@ VocchiPet 採用非同步架構處理數據持久化，預設支援 SQLite 本�
 | 欄位名 | 類型 | 說明 |
 | :--- | :--- | :--- |
 | `pet_uuid` | TEXT (PK) | 寵物的唯一識別碼 (UUID) |
-| `owner_uuid` | TEXT | 主人的唯一識別碼 (UUID) |
+| `owner_uuid` | TEXT | 當前主人的唯一識別碼 (UUID) |
+| `tamer_uuid` | TEXT | 最初馴養者（捕捉者）的唯一識別碼 (UUID) |
 | `pet_type` | TEXT | 寵物種類 (如 FIREBIRD) |
 | `level` | INTEGER | 寵物等級 |
 | `exp` | INTEGER | 寵物經驗值 |

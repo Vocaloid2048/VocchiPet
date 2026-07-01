@@ -54,6 +54,7 @@ class SqlitePetStorage(
                     CREATE TABLE IF NOT EXISTS vocchipet_data (
                         pet_uuid TEXT PRIMARY KEY,
                         owner_uuid TEXT NOT NULL,
+                        tamer_uuid TEXT NOT NULL,
                         pet_type TEXT NOT NULL,
                         level INTEGER NOT NULL,
                         exp INTEGER NOT NULL,
@@ -67,6 +68,16 @@ class SqlitePetStorage(
                     );
                 """.trimIndent()
                 conn.createStatement().execute(sql)
+                
+                // 檢查並為舊資料表添加 tamer_uuid 欄位 (Migration)
+                // Check and add tamer_uuid column for existing table (Migration)
+                try {
+                    conn.createStatement().execute("ALTER TABLE vocchipet_data ADD COLUMN tamer_uuid TEXT DEFAULT ''")
+                    // 將預設值設為 owner_uuid (若原本已有數據)
+                    conn.createStatement().execute("UPDATE vocchipet_data SET tamer_uuid = owner_uuid WHERE tamer_uuid = ''")
+                } catch (e: Exception) {
+                    // 欄位可能已存在，忽略異常 / Column might already exist, ignore exception
+                }
             }
         }, executor)
     }
@@ -83,17 +94,18 @@ class SqlitePetStorage(
             getConnection().use { conn ->
                 val sql = """
                     INSERT OR REPLACE INTO vocchipet_data 
-                    (pet_uuid, owner_uuid, pet_type, level, exp, affection, element) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?);
+                    (pet_uuid, owner_uuid, tamer_uuid, pet_type, level, exp, affection, element) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                 """.trimIndent()
                 val pstmt: PreparedStatement = conn.prepareStatement(sql)
                 pstmt.setString(1, pet.getUniqueId().toString())
                 pstmt.setString(2, pet.getOwnerId().toString())
-                pstmt.setString(3, pet.getType())
-                pstmt.setInt(4, pet.getLevel())
-                pstmt.setInt(5, pet.getExp())
-                pstmt.setDouble(6, pet.getAffection())
-                pstmt.setString(7, pet.getElement().name)
+                pstmt.setString(3, pet.getTamerId().toString())
+                pstmt.setString(4, pet.getType())
+                pstmt.setInt(5, pet.getLevel())
+                pstmt.setInt(6, pet.getExp())
+                pstmt.setDouble(7, pet.getAffection())
+                pstmt.setString(8, pet.getElement().name)
                 pstmt.executeUpdate()
             }
         }, executor)
@@ -199,6 +211,7 @@ class SqlitePetStorage(
         return PetImpl(
             uuid = UUID.fromString(rs.getString("pet_uuid")),
             ownerId = UUID.fromString(rs.getString("owner_uuid")),
+            tamerId = UUID.fromString(rs.getString("tamer_uuid")),
             type = rs.getString("pet_type"),
             level = rs.getInt("level"),
             exp = rs.getInt("exp"),

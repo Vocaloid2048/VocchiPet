@@ -25,6 +25,22 @@ interface Pet {
     fun getOwnerId(): UUID
 
     /**
+     * 設定新的主人。
+     * Sets a new owner for the pet.
+     *
+     * @param ownerId 新主人的 UUID / The UUID of the new owner.
+     */
+    fun setOwnerId(ownerId: UUID)
+
+    /**
+     * 獲取最初馴養者（捕捉者）的唯一識別碼。
+     * Gets the unique identifier (UUID) of the original tamer (capturer).
+     *
+     * @return 馴養者的 UUID / The UUID of the tamer.
+     */
+    fun getTamerId(): UUID
+
+    /**
      * 獲取寵物的類型。
      * Gets the type of the pet.
      *
