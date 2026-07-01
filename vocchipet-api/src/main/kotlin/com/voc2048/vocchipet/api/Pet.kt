@@ -17,20 +17,44 @@ interface Pet {
     fun getUniqueId(): UUID
 
     /**
-     * 獲取寵物的顯示名稱。
-     * Gets the display name of the pet.
+     * 獲取主人的唯一識別碼。
+     * Gets the unique identifier (UUID) of the owner.
      *
-     * @return 寵物的顯示名稱 / The display name of the pet.
+     * @return 主人的 UUID / The UUID of the owner.
      */
-    fun getName(): String
+    fun getOwnerId(): UUID
 
     /**
-     * 獲取寵物的當前好感度（0-100）。
-     * Gets the current affection level of the pet (0-100).
+     * 獲取寵物的類型。
+     * Gets the type of the pet.
+     *
+     * @return 寵物類型名稱 / The type name of the pet.
+     */
+    fun getType(): String
+
+    /**
+     * 獲取寵物的等級。
+     * Gets the level of the pet.
+     *
+     * @return 寵物等級 / The level of the pet.
+     */
+    fun getLevel(): Int
+
+    /**
+     * 獲取寵物的經驗值。
+     * Gets the experience points of the pet.
+     *
+     * @return 寵物經驗值 / The experience points of the pet.
+     */
+    fun getExp(): Int
+
+    /**
+     * 獲取寵物的當前好感度。
+     * Gets the current affection level of the pet.
      *
      * @return 寵物的好感度數值 / The affection level value of the pet.
      */
-    fun getAffection(): Int
+    fun getAffection(): Double
 
     /**
      * 獲取寵物的元素屬性。
