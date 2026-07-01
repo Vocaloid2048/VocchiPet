@@ -1,7 +1,6 @@
 package com.voc2048.vocchipet.interaction
 
 import com.voc2048.vocchipet.VocchiPet
-import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.Pet
 import com.voc2048.vocchipet.api.Tier
 import org.bukkit.Bukkit
@@ -9,6 +8,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import kotlin.math.min
 
 /**
  * 寵物背包 GUI 介面。
@@ -29,7 +29,7 @@ class PetBagGui(private val plugin: VocchiPet) {
 
             val pageSize = 45
             val start = (page - 1) * pageSize
-            val end = minOf(start + pageSize, pets.size)
+            val end = min(start + pageSize, pets.size)
 
             if (start < pets.size) {
                 for (i in start until end) {
@@ -81,27 +81,33 @@ class PetBagGui(private val plugin: VocchiPet) {
 
     private fun createPetItem(pet: Pet): ItemStack {
         val species = plugin.getSpeciesRegistry().getSpecies(pet.getType())
-        val material = species?.modelItem?.type ?: Material.WOLF_SPAWN_EGG
+        val material = when (species?.entityType?.name) {
+            "BLAZE" -> Material.BLAZE_SPAWN_EGG
+            "TURTLE" -> Material.TURTLE_SPAWN_EGG
+            "SNIFFER" -> Material.SNIFFER_SPAWN_EGG
+            "BEE" -> Material.BEE_SPAWN_EGG
+            "WITHER_SKELETON" -> Material.WITHER_SKELETON_SPAWN_EGG
+            else -> Material.WOLF_SPAWN_EGG
+        }
         
         val item = ItemStack(material)
         val meta = item.itemMeta
-        meta?.setDisplayName("§b${species?.displayName ?: pet.getType()} §f(Lv.${pet.getLevel()})")
+        meta?.setDisplayName("§b${pet.getName()} §f(Lv.${pet.getLevel()})")
         
         val stats = pet.getStats()
         val lore = mutableListOf<String>()
-        lore.add("§7屬性: ${getElementColor(pet.getElement())}${pet.getElement()}")
-        if (pet.isStreaming()) {
-            lore.add("§6✦ 流光亞種 (Streaming) ✦")
+        lore.add("§7種類: §f${species?.displayName ?: pet.getType()}")
+        if (pet.isSubspecies()) {
+            lore.add("§6✦ 特殊亞種 (Subspecies) ✦")
         }
         lore.add(" ")
-        lore.add("§f屬性資質與訓練 (IT/AT):")
+        lore.add("§f先天加成階級 (Innate Bonus):")
         lore.add(formatStatLore("生命", stats.hp))
         lore.add(formatStatLore("攻擊", stats.attack))
         lore.add(formatStatLore("防禦", stats.defense))
         lore.add(formatStatLore("速度", stats.speed))
         lore.add(formatStatLore("專注", stats.focus))
         lore.add(" ")
-        lore.add("§7剩餘 TP: §e${stats.availableTp}")
         lore.add("§7好感度: §d${"%.1f".format(pet.getAffection())}")
         lore.add(" ")
         lore.add("§e點擊召喚寵物")
@@ -112,26 +118,18 @@ class PetBagGui(private val plugin: VocchiPet) {
     }
 
     private fun formatStatLore(label: String, component: com.voc2048.vocchipet.api.StatComponent): String {
+        val tierValue = component.potential.ordinal + 1
         val tierColor = getTierColor(component.potential)
-        return " §7$label: $tierColor${component.potential} §8| §bAT: ${component.trained}"
+        return " §7$label: $tierColor Tier $tierValue"
     }
 
-    private fun getElementColor(element: Element): String = when (element) {
-        Element.FIRE -> "§c"
-        Element.WATER -> "§b"
-        Element.GRASS -> "§a"
-        Element.LIGHT -> "§e"
-        Element.DARK -> "§8"
-    }
-
-    private fun getTierColor(tier: Tier): String = when (tier) {
-        Tier.D -> "§7"
-        Tier.C -> "§f"
-        Tier.B -> "§a"
-        Tier.A -> "§b"
-        Tier.S -> "§5"
-        Tier.SS -> "§6"
-        Tier.SS_PLUS -> "§e"
-        Tier.UR -> "§d"
+    private fun getTierColor(tier: Tier): String = when (tier.ordinal) {
+        in 0..3 -> "§7"
+        in 4..7 -> "§f"
+        in 8..11 -> "§a"
+        in 12..13 -> "§b"
+        14 -> "§5"
+        15 -> "§6"
+        else -> "§f"
     }
 }

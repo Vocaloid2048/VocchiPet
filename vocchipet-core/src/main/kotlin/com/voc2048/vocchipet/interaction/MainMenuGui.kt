@@ -35,12 +35,20 @@ class MainMenuGui(private val plugin: VocchiPet) {
         val statusItem: ItemStack
         if (summonedPet != null) {
             val species = plugin.getSpeciesRegistry().getSpecies(summonedPet.getType())
-            statusItem = ItemStack(species?.modelItem?.type ?: Material.WOLF_SPAWN_EGG)
+            val material = when (species?.entityType?.name) {
+                "BLAZE" -> Material.BLAZE_SPAWN_EGG
+                "TURTLE" -> Material.TURTLE_SPAWN_EGG
+                "SNIFFER" -> Material.SNIFFER_SPAWN_EGG
+                "BEE" -> Material.BEE_SPAWN_EGG
+                "WITHER_SKELETON" -> Material.WITHER_SKELETON_SPAWN_EGG
+                else -> Material.WOLF_SPAWN_EGG
+            }
+            statusItem = ItemStack(material)
             val meta = statusItem.itemMeta
-            meta?.setDisplayName("§b當前召喚：${species?.displayName ?: summonedPet.getType()}")
+            meta?.setDisplayName("§b當前召喚：${summonedPet.getName()}")
             meta?.lore = listOf(
+                "§7種類: §f${species?.displayName ?: summonedPet.getType()}",
                 "§7等級: §f${summonedPet.getLevel()}",
-                "§7屬性: §e${summonedPet.getElement()}",
                 "§7好感度: §d${"%.1f".format(summonedPet.getAffection())}"
             )
             statusItem.itemMeta = meta
@@ -54,12 +62,12 @@ class MainMenuGui(private val plugin: VocchiPet) {
         inv.setItem(13, statusItem)
 
         // 說明按鈕
-        val closeItem = ItemStack(Material.BOOK)
-        val closeMeta = closeItem.itemMeta
-        closeMeta?.setDisplayName("§f說明指南")
-        closeMeta?.lore = listOf("§7查看如何開始你的寵物之旅。", "§7View guide on how to start.")
-        closeItem.itemMeta = closeMeta
-        inv.setItem(15, closeItem)
+        val infoItem = ItemStack(Material.BOOK)
+        val infoMeta = infoItem.itemMeta
+        infoMeta?.setDisplayName("§f說明指南")
+        infoMeta?.lore = listOf("§7查看如何開始你的寵物之旅。", "§7View guide on how to start.")
+        infoItem.itemMeta = infoMeta
+        inv.setItem(15, infoItem)
 
         player.openInventory(inv)
     }

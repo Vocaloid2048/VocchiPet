@@ -1,7 +1,6 @@
 package com.voc2048.vocchipet.interaction
 
 import com.voc2048.vocchipet.PetImpl
-import com.voc2048.vocchipet.api.Element
 import com.voc2048.vocchipet.api.PetSpecies
 import com.voc2048.vocchipet.api.PetStats
 import com.voc2048.vocchipet.api.Tier
@@ -48,36 +47,38 @@ object PetAdminParser {
     fun parseAndCreatePet(species: PetSpecies, ownerId: UUID, paramStr: String): PetImpl {
         val params = parseParameters(paramStr)
         
-        var level = params["level"]?.toIntOrNull() ?: 1
+        val level = params["level"]?.toIntOrNull() ?: 1
         val tiers = Tier.entries.toTypedArray()
         
-        fun getTier(key: String) = params[key]?.uppercase()?.let { try { Tier.valueOf(it) } catch(e: Exception) { null } } ?: tiers.random()
-        fun getAt(key: String) = params[key]?.toIntOrNull() ?: 0
+        fun getTier(key: String): Tier {
+            val value = params[key] ?: return tiers.random()
+            // 嘗試解析為數字 (1-16)
+            val num = value.toIntOrNull()
+            if (num != null) {
+                val index = (num - 1).coerceIn(0, 15)
+                return tiers[index]
+            }
+            // 嘗試解析為 Enum 名稱
+            return try { Tier.valueOf(value.uppercase()) } catch(e: Exception) { tiers.random() }
+        }
 
         val itHp = getTier("it_hp")
         val itAtk = getTier("it_atk")
         val itDef = getTier("it_def")
         val itSpd = getTier("it_spd")
-        val itFcs = params["it_fcs"]?.let { getTier("it_fcs") } ?: getTier("it_focus")
+        val itFcs = if (params.containsKey("it_fcs")) getTier("it_fcs") else getTier("it_focus")
         
-        val atHp = getAt("at_hp")
-        val atAtk = getAt("at_atk")
-        val atDef = getAt("at_def")
-        val atSpd = getAt("at_spd")
-        val atFcs = params["at_fcs"]?.let { getAt("at_fcs") } ?: getAt("at_focus")
-
-        var element = params["element"]?.uppercase()?.let { try { Element.valueOf(it) } catch(e: Exception) { null } } ?: species.element
-        var streaming = params["shinny"]?.toBoolean() ?: params["shiny"]?.toBoolean() ?: false
+        val subspecies = params["sub"]?.toBoolean() ?: params["subspecies"]?.toBoolean() ?: false
+        val name = params["name"] ?: species.displayName
 
         val baseStats = species.baseStats
         val stats = PetStats(
-            hp = baseStats.hp.copy(potential = itHp, trained = atHp),
-            attack = baseStats.attack.copy(potential = itAtk, trained = atAtk),
-            defense = baseStats.defense.copy(potential = itDef, trained = atDef),
-            speed = baseStats.speed.copy(potential = itSpd, trained = atSpd),
-            focus = baseStats.focus.copy(potential = itFcs, trained = atFcs),
-            availableTp = 0,
-            skills = arrayOfNulls(6)
+            hp = baseStats.hp.copy(potential = itHp),
+            attack = baseStats.attack.copy(potential = itAtk),
+            defense = baseStats.defense.copy(potential = itDef),
+            speed = baseStats.speed.copy(potential = itSpd),
+            focus = baseStats.focus.copy(potential = itFcs),
+            skills = arrayOfNulls(4)
         )
 
         return PetImpl(
@@ -85,12 +86,12 @@ object PetAdminParser {
             ownerId = ownerId,
             tamerId = ownerId,
             type = species.id,
+            name = name,
             level = level,
             exp = 0,
             affection = 20.0,
-            element = element,
             stats = stats,
-            streaming = streaming
+            subspecies = subspecies
         )
     }
 }

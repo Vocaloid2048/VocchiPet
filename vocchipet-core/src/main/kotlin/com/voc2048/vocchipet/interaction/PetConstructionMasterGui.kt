@@ -35,9 +35,8 @@ class PetConstructionMasterGui(private val plugin: VocchiPet) {
         for (i in 0..8) inv.setItem(i, glass)
         
         // 基礎屬性調整 (Row 0)
-        inv.setItem(0, createButtonItem(Material.NETHER_STAR, "§b流光狀態: §7關閉"))
-        inv.setItem(1, createButtonItem(Material.FIRE_CHARGE, "§6元素屬性: §f${species.element}"))
-        // Slot 2: Target Info (Hidden)
+        inv.setItem(0, createButtonItem(Material.NETHER_STAR, "§b亞種狀態: §7關閉"))
+        // Slot 1-2: Reserved
         inv.setItem(3, createButtonItem(Material.RED_TERRACOTTA, "§cLv -10"))
         inv.setItem(4, createButtonItem(Material.PINK_TERRACOTTA, "§dLv -1"))
         inv.setItem(5, createInfoItem(Material.EXPERIENCE_BOTTLE, "§e等級: §f1"))
@@ -45,7 +44,7 @@ class PetConstructionMasterGui(private val plugin: VocchiPet) {
         inv.setItem(7, createButtonItem(Material.GREEN_TERRACOTTA, "§2Lv +10"))
         inv.setItem(8, createButtonItem(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, "§a§l確認生成並發放", listOf("§7目標玩家: §f${target.name}")))
 
-        // 五維屬性調整 (Row 1-5)
+        // 先天屬性資質調整 (Row 1-5)
         setupStatRow(inv, 9, "生命 (HP)")
         setupStatRow(inv, 18, "攻擊 (ATK)")
         setupStatRow(inv, 27, "防禦 (DEF)")
@@ -65,15 +64,21 @@ class PetConstructionMasterGui(private val plugin: VocchiPet) {
     private fun setupStatRow(inv: Inventory, startSlot: Int, label: String) {
         inv.setItem(startSlot, createInfoItem(Material.IRON_BARS, "§f§l$label"))
         
-        // IT 調整 (Slot +2)
-        inv.setItem(startSlot + 2, createButtonItem(Material.GOLD_INGOT, "§e資質 (IT): §fD", listOf("§7點擊切換 D~UR")))
+        // 資質調整 (IT) - 修改為 16 級
+        inv.setItem(startSlot + 2, createButtonItem(Material.RED_STAINED_GLASS_PANE, "§c$label Tier -1"))
+        inv.setItem(startSlot + 4, createInfoItem(Material.GOLD_INGOT, "§e先天階級 (Tier): §f1"))
+        inv.setItem(startSlot + 6, createButtonItem(Material.LIME_STAINED_GLASS_PANE, "§a$label Tier +1"))
         
-        // AT 調整
-        inv.setItem(startSlot + 4, createButtonItem(Material.RED_STAINED_GLASS_PANE, "§c$label AT -5"))
-        inv.setItem(startSlot + 5, createButtonItem(Material.PINK_STAINED_GLASS_PANE, "§d$label AT -1"))
-        inv.setItem(startSlot + 6, createInfoItem(Material.BOOK, "§b訓練 (AT): §f0"))
-        inv.setItem(startSlot + 7, createButtonItem(Material.LIME_STAINED_GLASS_PANE, "§a$label AT +1"))
-        inv.setItem(startSlot + 8, createButtonItem(Material.GREEN_STAINED_GLASS_PANE, "§2$label AT +5"))
+        // 填充其餘格子
+        val glass = ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
+        val glassMeta = glass.itemMeta
+        glassMeta?.setDisplayName(" ")
+        glass.itemMeta = glassMeta
+        inv.setItem(startSlot + 1, glass)
+        inv.setItem(startSlot + 3, glass)
+        inv.setItem(startSlot + 5, glass)
+        inv.setItem(startSlot + 7, glass)
+        inv.setItem(startSlot + 8, glass)
     }
 
     private fun createButtonItem(material: Material, name: String, lore: List<String> = emptyList()): ItemStack {
